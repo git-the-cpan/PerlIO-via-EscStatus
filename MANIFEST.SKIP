@@ -1,0 +1,17 @@
+^#
+/#
+/\.#
+~$
+^\.#
+\.old$
+\.bak$
+^Makefile$
+\.tar\.gz$
+^backup
+^misc
+^blib
+^pm_to_blib
+^PerlIO-via
+\.deb$
+dist-deb
+^maybe

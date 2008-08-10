@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 COPYING
+SHA1 3a1635e6d957da52cfa030d95233e529753c475b MANIFEST
+SHA1 6f046a8b5fb545f23230cb23d8dc5c53e6e791ed MANIFEST.SKIP
+SHA1 9a1ccbb20b80f8ae00c261ce93fddd96fbd0e54f META.yml
+SHA1 e75e6921b8eb36c1552e4ba133162d87d7337fbc Makefile.PL
+SHA1 8638c6b57689bf5dbcb7902dcfe963eb5f0782f2 README
+SHA1 e25c1699b2ca64bd121f16560755ba01c8ea69ed debian/changelog
+SHA1 1b6453892473a467d07372d45eb05abc2031647a debian/compat
+SHA1 19b3cf5a28e985c9e40bfe5050386190bb576ca0 debian/control
+SHA1 257475ef52213feb7515d6d9e30b583a05c25f14 debian/copyright
+SHA1 31c8b21a893dc588eb98a271fb9b8e5eb7e210bc debian/rules
+SHA1 80af397cf44ab3129e40de9d130d664c848ee113 debian/watch
+SHA1 44cc8d887b060aabdaa4663782fea3c8b872c70d devel/ansi.pl
+SHA1 f2273b093e3f843b4a25383ec03970539f753a24 devel/encoding.pl
+SHA1 2fed2e3d17b9ffcf96cc545e4deee4a964915e78 devel/misc.pl
+SHA1 0b8aff1c9c0cb3ab88ef27db1e9d9f479c482e15 devel/non-match.pl
+SHA1 dfc081dfb7023df027f1650a25c374206ac1f8e1 devel/partial-end.pl
+SHA1 101619a935e09163c796330ea9f31d080f3ad472 devel/tostream.pl
+SHA1 0f80996d5de36419eb82a6ed93d97eee57c87a6d devel/unicode.pl
+SHA1 598ad1bb0549c65f8bbcc0e5aceaf35b9e355116 examples/colour.pl
+SHA1 3e8ef0f87617c92d288cdb271a9dbc0ed391bd8e examples/demo.pl
+SHA1 11a170731456eb6c4642051325177266942e0eaa examples/fracs.pl
+SHA1 af13ce00e6260d202a4d7a2151a9983de973962f examples/progressmonitor.pl
+SHA1 b3ff1a097971a652c95cd8ff864dcfccb3ebdc8b examples/showall.pl
+SHA1 2946c6d187bc790fe65a92bbf3f565f6337cb0ec examples/shownone.pl
+SHA1 550ffa30ebb386e556820d7de548a55cfa88ad8f examples/wide.pl
+SHA1 f6d525e62d3078f69e2ab57c63828fff49a67c35 lib/PerlIO/via/EscStatus.pm
+SHA1 2a31ff6a9d43135e0b821797a178c616e63ad6c0 lib/PerlIO/via/EscStatus/Parser.pm
+SHA1 c2713287bacfcd0393e6eb4e9f97c0aa4ee775b5 lib/PerlIO/via/EscStatus/ShowAll.pm
+SHA1 087fca32297aed659925de34d7f0b7e9b112bdd7 lib/PerlIO/via/EscStatus/ShowNone.pm
+SHA1 6d0227654480d8a2064e7352cfc0a81662e6f485 lib/ProgressMonitor/Stringify/ToEscStatus.pm
+SHA1 2f0db39403e990508a8f484c7a0f8bb64112e5f1 lib/Regexp/Common/ANSIescape.pm
+SHA1 85568db04509a5efcf0610d4d14e7fb2f39c94b2 t/ANSIescape.t
+SHA1 9ae18ba5cdeeaf87e10734e949b202c6bba13a07 t/EscStatus.t
+SHA1 d65a06fdbff05e31a363ecec5a6af21771005083 t/Parser.t
+SHA1 0b94057598bc730d90261e82690e5133b44ca8a2 t/ShowAll.t
+SHA1 31100d54db15a30967b2063cfc56398f9a2e7cf8 t/ShowNone.t
+SHA1 819748956a0490b242c8733e53244911755e69b9 t/ToEscStatus.t
+SHA1 a661a39e55a4127aecb1b97a631c4f01f7dce8c6 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iD8DBQFIn3J7LFMCIV9q3ToRAr33AJ9pNY+xXiViw057A8Wqb4SDGqkA+gCgl5Bq
+W2gncGHMOuIubAVgMAzah1E=
+=T9jE
+-----END PGP SIGNATURE-----
