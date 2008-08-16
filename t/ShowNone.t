@@ -23,8 +23,8 @@ use warnings;
 use Test::More tests => 3;
 use PerlIO::via::EscStatus::ShowNone;
 
-ok ($PerlIO::via::EscStatus::ShowNone::VERSION >= 1);
-ok (PerlIO::via::EscStatus::ShowNone->VERSION >= 1);
+ok ($PerlIO::via::EscStatus::ShowNone::VERSION >= 2);
+ok (PerlIO::via::EscStatus::ShowNone->VERSION  >= 2);
 
 sub slurp {
   my ($filename) = @_;

@@ -24,10 +24,10 @@
 # 3/4 which are in latin1 and unicode.
 #
 # When doing this you have to push any necessary ":encoding" transformation
-# layer yourself, EscStatus doesn't do that.  The code below's assumes the
-# tty will take the charset from langinfo(CODESET), which is almost
-# certainly what you want.  (See also PerlIO::locale for doing the same, or
-# "use open" pragma to make it the default for new tty opens.)
+# layer yourself, EscStatus doesn't do that.  The code below assumes the tty
+# uses the charset from langinfo(CODESET), which is almost certainly true.
+# PerlIO::locale can do that codeset setup for you, and the "use open"
+# pragma can make it the default for new tty opens.
 #
 
 use strict;

@@ -23,8 +23,8 @@ use Test::More tests => 473;
 
 use PerlIO::via::EscStatus;
 
-ok ($PerlIO::via::EscStatus::VERSION >= 1);
-ok (PerlIO::via::EscStatus->VERSION >= 1);
+ok ($PerlIO::via::EscStatus::VERSION >= 2);
+ok (PerlIO::via::EscStatus->VERSION  >= 2);
 
 
 #------------------------------------------------------------------------------

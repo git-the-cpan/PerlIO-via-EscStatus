@@ -22,7 +22,7 @@ use warnings;
 use ProgressMonitor::State qw(STATE_DONE);
 use PerlIO::via::EscStatus;
 
-our $VERSION = 1;
+our $VERSION = 2;
 
 use classes
   extends => 'ProgressMonitor::Stringify::AbstractMonitor',
@@ -99,7 +99,7 @@ __END__
 
 =head1 NAME
 
-ProgressMonitor::Stringify::ToEscStatus - monitor implementation printing in EscStatus form
+ProgressMonitor::Stringify::ToEscStatus - monitor printing in EscStatus form
 
 =head1 SYNOPSIS
 
@@ -130,7 +130,16 @@ C<ToEscStatus> is a subclass of C<AbstractMonitor>,
 
 ToEscStatus implements a ProgressMonitor which prints status lines in
 EscStatus form, ready to be shown by an EscStatus layer on the output
-stream.  See F<examples/progressmonitor.pl> in the EscStatus sources for a
+stream.
+
+Basically where C<ProgressMonitor::Stringify::ToStream> would do something
+like C<< print "\rStatus line" >>, ToEscStatus instead does
+
+    print make_status("Status line")
+
+giving the output string form EscStatus uses.  The contents of the status
+line are built by configured C<ProgressMonitor> field objects in the usual
+way.  See F<examples/progressmonitor.pl> in the EscStatus sources for a
 demo.
 
 =head1 FUNCTIONS
@@ -153,12 +162,12 @@ parameters
 =item C<stream> (default C<STDOUT>)
 
 A file handle to write to.  The default is standard output, ie. C<\*STDOUT>
-(like C<ProgressMonitor::Stringify::ToStream>).
+(like C<ProgressMonitor::Stringify::ToStream> uses).
 
-ToEscStatus doesn't check what layers are in the stream.  If for instance
+ToEscStatus doesn't check what layers are on the stream.  If for instance
 you're printing to tty then it's your responsibility to push a
-C<PerlIO::via::EscStatus>.  Similarly setting C<:utf8> mode (or not) on the
-stream is your responsibility.
+C<PerlIO::via::EscStatus>.  Similarly it's your responsibility to set
+C<:utf8> mode (or not) if desired.
 
 =back
 

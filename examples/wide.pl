@@ -22,7 +22,7 @@
 #
 # This is an example of how "double-width" east asian characters are
 # recognised by EscStatus as taking two columns each.  The status $str is
-# 200 chars long, which will print in 400 columns, but is truncated to fit
+# 200 chars long, which will print as 400 columns, and it's truncated to fit
 # in 80 columns (or however wide your terminal is).
 #
 # You'll need a unicode tty with asian fonts to see this properly, "uxterm"
@@ -49,7 +49,7 @@ binmode (STDOUT, ':via(EscStatus)')
 my $str = ("\x{FF10}\x{FF11}\x{FF12}\x{FF13}\x{FF14}"
            . "\x{FF15}\x{FF16}\x{FF17}\x{FF18}\x{FF19}") x 20;
 foreach my $i (0 .. 10) {
-  print_status substr ($str, $i);
+  print_status "$i  ", substr($str,$i);
   usleep (500_000);
 }
 

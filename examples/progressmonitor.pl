@@ -18,6 +18,20 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# Usage: ./progressmonitor.pl
+#
+# This is a sample of ProgressMonitor::Stringify::ToEscStatus which directs
+# ProgressMonitor states to a stream with an EscStatus layer.
+#
+# As noted in the ToEscStatus docs you have to push an EscStatus layer
+# yourself but beyond that the only change part is $mon created as a
+# ToEscStatus where you'd otherwise use a ToStream.
+#
+# Incidentally, if you've got some code using ToStream it'll still work fine
+# with the EscStatus layer pushed.  The prints from ToStream are "ordinary
+# output" for the purposes of the layer and go out unmolested.
+#
+
 use strict;
 use warnings;
 use Time::HiRes qw(usleep);

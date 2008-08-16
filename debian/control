@@ -26,7 +26,7 @@ Bugs: mailto:user42@zip.com.au
 
 Package: libperlio-via-escstatus-perl
 Architecture: all
-Depends: perl (>= 5.8.3), libregexp-common-perl
+Depends: perl (>= 5.8.3), libregexp-common-perl, libterm-size-perl
 Suggests: libprogressmonitor-perl
 Description: Updating status line through an I/O layer
  EscStatus is a PerlIO layer for printing a status line on a dumb

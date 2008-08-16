@@ -22,10 +22,11 @@ use Carp;
 use Regexp::Common ('no_defaults', # no $RE import
                     'pattern');    # pattern func
 
-our $VERSION = 1;
+our $VERSION = 2;
+
+## no critic (ProhibitEscapedCharacters)
 
 use constant {
-  ## no critic (ProhibitEscapedCharacters)
   CSI_7BIT => "\e\\\x{5B}",  # ie. Esc and a literal [ char
   CSI_8BIT => "\x{9B}",
 
@@ -50,7 +51,7 @@ use constant {
   C1_STR_8BIT =>   "[\x{9D}\x{90}\x{98}\x{9E}\x{9F}]",
 
   # C1 forms not taking a string parameter
-  # ie. C1_ALL except the five in C1_STR (including not CSI 0x5B,0x9B)
+  # ie. C1_ALL except the five in C1_STR (and not CSI 0x5B,0x9B)
   # Note \x{5C} "\" doubled to escape.
   #
   C1_NST_7BIT => "\e[\x{40}-\x{4F}\x{51}-\x{57}\x{59}\x{5A}\\\x{5C}]",
@@ -75,13 +76,11 @@ pattern (name   => ['ANSIescape'],
              croak 'ANSIescape: cannot have only7bit and only8bit at the same time';
            }
 
-           ## no critic (ProhibitEscapedCharacters)
            my @ret;
            push @ret, (exists $flags->{-only7bit}   ? CSI_7BIT  # 7-bit only
                        : exists $flags->{-only8bit} ? CSI_8BIT  # 8-bit only
                        :                              CSI_7OR8) # 7bit or 8bit
            . "(?k:[0-9;]*)(?k:[\x{20}-\x{2F}]*[\x{40}-\x{7E}])";
-           ## use critic
 
            if (exists $flags->{-sepstring}) {
              if (! exists $flags->{-only8bit}) { push @ret, C1_ALL_7BIT; }
@@ -178,7 +177,7 @@ C<$2> as C<"30;49">.
 =item C<$3>
 
 Intermediate characters (if any) and final character of a CSI escape.  For
-example C<"\e[30m"> gives C<$3> as C<"m">, or with a space intermediate byte
+example C<"\e[30m"> gives C<$3> as C<"m">, or with a "+" intermediate byte
 C<< "\e[30+P" >> gives C<$3> as C<< "+P" >>.
 
 =back

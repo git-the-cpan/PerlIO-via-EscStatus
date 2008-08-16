@@ -21,13 +21,13 @@
 # Usage: ./colour.pl
 #
 # This is an example of including ANSI SGR escapes in the status lines.
-# EscStatus recognises all ANSI escapes as taking no width.  You can create
-# the escapes any way you want, here Term::ANSIColor is used to do it by
-# name (instead of the escape code numbers).
+# EscStatus recognises ANSI escapes as taking no width.  You can create the
+# escapes any way you want, here Term::ANSIColor is used to do it by name
+# (instead of the escape code numbers).
 #
 # Obviously how such escapes actually display depends on the terminal.  If
 # it's a non-ANSI terminal, or it's only black-and-white, or something, then
-# printing such escapes will be no good.
+# printing such escapes might be bad.
 #
 
 use strict;

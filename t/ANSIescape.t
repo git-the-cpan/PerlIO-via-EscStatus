@@ -23,8 +23,8 @@ use Test::More tests => 966;
 
 use Regexp::Common 'ANSIescape';
 
-ok ($Regexp::Common::ANSIescape::VERSION >= 1);
-ok (Regexp::Common::ANSIescape->VERSION >= 1);
+ok ($Regexp::Common::ANSIescape::VERSION >= 2);
+ok (Regexp::Common::ANSIescape->VERSION  >= 2);
 
 
 ## no critic (ProhibitEscapedCharacters)

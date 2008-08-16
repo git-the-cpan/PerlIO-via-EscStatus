@@ -24,8 +24,8 @@ use charnames ':full';
 
 use PerlIO::via::EscStatus::Parser;
 
-ok ($PerlIO::via::EscStatus::Parser::VERSION >= 1);
-ok (PerlIO::via::EscStatus::Parser->VERSION >= 1);
+ok ($PerlIO::via::EscStatus::Parser::VERSION >= 2);
+ok (PerlIO::via::EscStatus::Parser->VERSION  >= 2);
 
 require PerlIO::via::EscStatus;
 my $ESS = PerlIO::via::EscStatus::ESCSTATUS_STR();

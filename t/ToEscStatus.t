@@ -29,8 +29,8 @@ if (eval { require ProgressMonitor; 1 }) {
 }
 
 require ProgressMonitor::Stringify::ToEscStatus;
-ok ($ProgressMonitor::Stringify::ToEscStatus::VERSION >= 1);
-ok (ProgressMonitor::Stringify::ToEscStatus->VERSION >= 1);
+ok ($ProgressMonitor::Stringify::ToEscStatus::VERSION >= 2);
+ok (ProgressMonitor::Stringify::ToEscStatus->VERSION  >= 2);
 
 ok (ProgressMonitor::Stringify::ToEscStatus->new);
 

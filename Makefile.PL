@@ -32,12 +32,15 @@ WriteMakefile
                     # before that anyway
                     'PerlIO::via' => 0,
                     
-                    'Regexp::Common' => 0
+                    'Regexp::Common' => 0,
+                    'Term::Size' => 0,
                    },
    AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
    LICENSE      => 'gpl',
    SIGN         => 1,
 
+# recommends:
+#     ProgressMonitor: 0
    EXTRA_META => <<'HERE',
 no_index:
     directory:

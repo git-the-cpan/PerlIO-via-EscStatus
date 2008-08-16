@@ -21,7 +21,7 @@ use warnings;
 use PerlIO::via::EscStatus;
 use PerlIO::via::EscStatus::Parser;
 
-our $VERSION = 1;
+our $VERSION = 2;
 
 use constant DEBUG => 0;
 
@@ -50,7 +50,7 @@ __END__
 
 =head1 NAME
 
-PerlIO::via::EscStatus::ShowNone - suppress EscStatus lines
+PerlIO::via::EscStatus::ShowNone - suppress all status lines
 
 =head1 SYNOPSIS
 

@@ -32,7 +32,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use PerlIO::via::EscStatus::Parser;
 use Regexp::Common 'ANSIescape';
 
-our $VERSION = 1;
+our $VERSION = 2;
 
 # set this to 1 or 2 for some diagnostics to STDERR
 use constant DEBUG => 0;
@@ -43,9 +43,10 @@ use constant DEBUG => 0;
 # IO::Handle::flush(), an xsub, calls PerlIO_flush() (per perlapio) and
 # returns a status which can be returned by WRITE or CLOSE.
 #
-# A "local $|=1" to make print() do a flush (in the style of IO::Handle
-# printflush()) gets the flush status incorporated into the print() success
-# return, but it does "flush/print/flush", and the first flush is wasteful.
+# A "local $|=1" to make print() do a flush (in the style of
+# IO::Handle::printflush()) gets the flush status incorporated into the
+# print() success return, but it does "flush/print/flush", and that first
+# flush is wasteful.
 #
 # Believe autoflush $| is always off on the $fh subhandle, irrespective of
 # whether or not it's set on the top-level.  Is that right?
@@ -77,12 +78,13 @@ sub make_status {
 # Fields in each instance:
 #
 # "display" -- boolean whether to display the status.  True when the last
-# ordinary output char was a newline.  Status display is held off until the
-# whole line of ordinary output is complete.  When first pushed assume it's
-# the start of a line.
+# ordinary output char was a newline.  Status display is held off until any
+# line of ordinary output is complete.  When first pushed assume we it's the
+# start of a line.
 #
-# "status" -- current status string, or empty '' for none.  This has been
-# truncated to the tty width (the tty width as of when the status arrived).
+# "status" -- current status string, or empty string '' for none.  This has
+# been truncated to the tty width (the tty width as of when the status
+# arrived).
 #
 # "status_width" -- the print-width of the "status" string.  This can differ
 # from its length() due to tabs and zero-width and double-width unicode
@@ -411,8 +413,8 @@ sub _IsOther {
 # to get the width loses utf8 mode.  Not sure if clearing the flag is a bug
 # or a feature, if subsequent I/O goes through stdio alone then any encoding
 # transforms are lost so maybe bytes is correct.  In any case until
-# Term::Size uses PerlIO_fileno we open a temporary stream with the fileno()
-# of $fh to keep the original safe from harm.
+# Term::Size uses PerlIO_fileno do it here with a temporary stream on the
+# fileno() of $fh to keep the original safe from harm.
 #
 # There's probably plenty of other strategies for an idea of "print width"
 # on a stream.  Some sort of property of the whole stream, or per-layer,
@@ -479,11 +481,11 @@ The idea of an output layer is that it lets you send ordinary output with
 plain C<print>, C<printf>, etc, and the layer takes care of what status is
 showing, to clear and redraw as necessary.
 
-The alternative is a special message printing function to the clearing.  If
-you're in full control of your ordinary output then that's fine (and is for
-instance how C<Term::ProgressBar> does it), but if you might have parts of a
-library or program only setup to use plain C<print> then a layer is a good
-way to keep them from making a mess of the status display.
+The alternative is a special message printing function to do the clearing.
+If you're in full control of your ordinary output then that's fine (and is
+for instance how C<Term::ProgressBar> does it), but if you might have parts
+of a library or program only setup with plain C<print> then a layer is a
+good way to keep them from making a mess of the display.
 
 The "in-band" method of passing status strings to the layer has the
 advantage that higher layers can buffer or do extra transformations and
@@ -516,15 +518,15 @@ For string width calculations tabs (C<\t>) are 8 spaces.  Various East Asian
 "double-width" characters take two columns.  BEL (C<\a>), ANSI escapes, and
 various unicode modifier characters take no space.  If a status line is
 truncated then all ANSI escapes are kept, so if say bold is turned on and
-off then the off is not lost.
+off then the off is retained.
 
 If a lower layer expands a character because it's unencodable on the final
-output then that's likely to make a mess of the width calculation in
-EscStatus.  For example the C<:encoding> layer in C<PERLQQ> mode turns
-unencodables into 8 characters C<"\x{1234}">, which is more than EscStatus
-will have allowed for.  The suggestion is to expand or transform before
-EscStatus so it sees what's really going to go out.  (An encode and
-re-decode is one way to do that, though a bit wasteful.)
+output then that's likely to make a mess of the width calculation.  For
+example the C<:encoding> layer C<PERLQQ> mode turns unencodables into 8
+characters C<"\x{1234}">, which is more than EscStatus will have allowed
+for.  The suggestion is to expand or transform before EscStatus so it sees
+what's really going to go out.  (An encode and re-decode is one way to do
+that, though a bit wasteful.)
 
 =head1 FUNCTIONS
 
@@ -548,10 +550,10 @@ a single line of status is possible.
 The suggestion is to push C<PerlIO::via::EscStatus> onto C<STDOUT> and leave
 C<STDERR> alone.  Leaving C<STDERR> alone has the advantage of not putting
 anything in the way of an unexpected error print.  You can trap "normal"
-errors and turn them into a print on C<STDOUT>, with C<STDERR> only for the
-unexpected.  The alternative is to C<< >&= >> alias stderr onto stdout.  The
-latter makes sense since there's only one actual destination (the terminal),
-once you trust EscStatus not to lose anything!
+errors and turn them into a print on C<STDOUT>, leaving C<STDERR> only for
+the unexpected.  The alternative is to C<< >&= >> alias stderr onto stdout.
+The latter makes sense since there's only one actual destination (the
+terminal), once you trust EscStatus not to lose anything!
 
 When updating the displayed status it's important not to hammer the terminal
 with too much output.  It can easily become the speed of the terminal and
@@ -572,14 +574,14 @@ empty status to clear, or to pop the EscStatus (erasing when popped works).
     print_status ('');
     close STDOUT;  # or "exit 0" or whatever
 
-If the utf8 flag on the stream is changed (by C<binmode>), EscStatus doesn't
+If the utf8 flag on the stream is changed (by C<binmode>) EscStatus doesn't
 notice and will keep using the state when it was first pushed.  Perhaps this
 can change in the future (assuming there's sensible uses for turning it on
 and off dynamically).
 
 As of Perl 5.10.0 an xsub using C<PerlIO_findFILE> like C<Term::Size>
 version 0.2 turns off the C<utf8> flag on the stream, preventing wide-char
-output.  EscStatus has a workaround for its use of C<Term::Size>, an
+output.  EscStatus has a workaround for its use of C<Term::Size> and an
 application might need to do the same.  The symptom is the usual "Wide
 character in print" warning (on a stream you thought you'd setup for wide
 output).

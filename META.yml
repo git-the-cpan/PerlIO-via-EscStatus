@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                PerlIO-via-EscStatus
-version:             1
+version:             2
 abstract:            Printing a status line through an I/O layer.
 license:             gpl
 author:              
@@ -10,6 +10,7 @@ distribution_type:   module
 requires:     
     PerlIO::via:                   0
     Regexp::Common:                0
+    Term::Size:                    0
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.3.html
     version: 1.3
