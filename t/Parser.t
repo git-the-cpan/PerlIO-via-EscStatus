@@ -19,13 +19,12 @@
 
 use strict;
 use warnings;
+use PerlIO::via::EscStatus::Parser;
 use Test::More tests => 38;
 use charnames ':full';
 
-use PerlIO::via::EscStatus::Parser;
-
-ok ($PerlIO::via::EscStatus::Parser::VERSION >= 2);
-ok (PerlIO::via::EscStatus::Parser->VERSION  >= 2);
+ok ($PerlIO::via::EscStatus::Parser::VERSION >= 3);
+ok (PerlIO::via::EscStatus::Parser->VERSION  >= 3);
 
 require PerlIO::via::EscStatus;
 my $ESS = PerlIO::via::EscStatus::ESCSTATUS_STR();

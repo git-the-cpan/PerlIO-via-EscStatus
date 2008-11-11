@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                PerlIO-via-EscStatus
-version:             2
+version:             3
 abstract:            Printing a status line through an I/O layer.
 license:             gpl
 author:              

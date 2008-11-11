@@ -20,11 +20,11 @@
 use 5.006;  # 3-arg open
 use strict;
 use warnings;
-use Test::More tests => 3;
 use PerlIO::via::EscStatus::ShowAll;
+use Test::More tests => 4;
 
-ok ($PerlIO::via::EscStatus::ShowAll::VERSION >= 2);
-ok (PerlIO::via::EscStatus::ShowAll->VERSION  >= 2);
+ok ($PerlIO::via::EscStatus::ShowAll::VERSION >= 3);
+ok (PerlIO::via::EscStatus::ShowAll->VERSION  >= 3);
 
 sub slurp {
   my ($filename) = @_;
@@ -34,13 +34,35 @@ sub slurp {
   return $content;
 }
 
-{ require File::Temp;
+{ diag "on a binary file";
+  require File::Temp;
   my $tmp = File::Temp->new;
   my $filename = $tmp->filename;
   open (my $fh, '>', $filename) or die "Cannot open $filename for write: $!";
 
   binmode ($fh, ':via(EscStatus::ShowAll)')
-    or die "Cannot push layer";
+    or die "Cannot push EscStatus::ShowAll layer";
+
+  print $fh "start\n";
+  require PerlIO::via::EscStatus;
+  print $fh PerlIO::via::EscStatus::make_status('foo');
+  print $fh "end\n";
+  close ($fh) or die "Error closing write $filename";
+
+  my $str = slurp ($filename);
+  is ($str, "start\nfoo\nend\n");
+}
+
+{ diag "on a utf8 file";
+  require File::Temp;
+  my $tmp = File::Temp->new;
+  my $filename = $tmp->filename;
+  open (my $fh, '>', $filename) or die "Cannot open $filename for write: $!";
+
+  binmode ($fh, ':utf8')
+    or die "Cannot set utf8 mode";
+  binmode ($fh, ':via(EscStatus::ShowAll)')
+    or die "Cannot push EscStatus::ShowAll layer";
 
   print $fh "start\n";
   require PerlIO::via::EscStatus;

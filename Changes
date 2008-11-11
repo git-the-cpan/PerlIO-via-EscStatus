@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License along
 with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 3, November 2008
+    - fix ShowAll on utf8 streams
+    - maybe fix char classes for early 5.8.x
+
 Version 2, August 2008
     - forgot Term::Size in Makefile.PL
 

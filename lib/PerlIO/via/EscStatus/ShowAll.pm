@@ -21,7 +21,7 @@ use warnings;
 use PerlIO::via::EscStatus;
 use PerlIO::via::EscStatus::Parser;
 
-our $VERSION = 2;
+our $VERSION = 3;
 
 use constant DEBUG => 0;
 
@@ -34,7 +34,7 @@ sub PUSHED {
   return bless { partial => '' }, $class;
 }
 
-*UTF8 = \&PerlIO::via::EscStatus::FLUSH;
+*UTF8 = \&PerlIO::via::EscStatus::UTF8;
 *FLUSH = \&PerlIO::via::EscStatus::FLUSH;
 
 sub WRITE {
@@ -78,10 +78,10 @@ instead of each new status overwriting the previous they all display,
 scrolling up the screen.  This is mainly intended for development or
 diagnostic use.
 
-With the current EscStatus output format this in fact merely means stripping
-the "APC" control sequence and letting the rest go straight through.  If
-your terminal doesn't mind miscellaneous APC sequences then it may well be
-readable with no filtering at all.
+With the current EscStatus output format this layer merely strips the
+EscStatus "APC" intro control sequence and lets the rest go straight
+through.  If your terminal doesn't mind miscellaneous APC sequences then it
+might even be readable with no filtering at all.
 
 =head1 SEE ALSO
 

@@ -32,7 +32,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use PerlIO::via::EscStatus::Parser;
 use Regexp::Common 'ANSIescape';
 
-our $VERSION = 2;
+our $VERSION = 3;
 
 # set this to 1 or 2 for some diagnostics to STDERR
 use constant DEBUG => 0;
@@ -171,7 +171,7 @@ sub _erase_status {
 # supply a FLUSH, so chain down explicitly.
 sub FLUSH {
   my ($self, $fh) = @_;
-  if (DEBUG) { print STDERR "FLUSH $self $fh\n"; }
+  if (DEBUG) { print STDERR "EscStatus FLUSH $self $fh\n"; }
   if ($fh) {
     return $fh->flush;
   } else {
@@ -273,6 +273,41 @@ sub WRITE {
   return $ret_ok;
 }
 
+#------------------------------------------------------------------------------
+
+# Zero-width char class.
+# CR treated as zero width in case it occurs as CRLF.
+#
+sub _IsZero {
+  return "+utf8::Me\n"  # mark, enclosing
+       . "+utf8::Mn\n"  # mark, non-spacing
+       . "+utf8::Cf\n"  # control, format
+       . "-00AD\n"      #    but exclude soft hyphen which is in Cf
+       . "+0007\n"      # BEL
+       . "+000D\n";     # CR, for our purposes
+}
+
+# Double-width char class, being East Asian "wide" and "full" chars.
+# Rumour has it this might be locale-dependent.  When turned into a
+# non-unicode charset there can be slightly different width rules, or
+# something like that.
+#
+sub _IsDouble {
+  return "+utf8::EastAsianWidth:W\n"
+       . "+utf8::EastAsianWidth:F\n";
+}
+
+# "Other" char class, being anything which doesn't introduce one of the
+# other regexp subexprs, and meaning in practice a single-width char.
+#
+sub _IsOther {
+  return "!PerlIO::via::EscStatus::_IsZero\n"
+       . "-PerlIO::via::EscStatus::_IsDouble\n"
+       . "-0009\n"         # not a Tab
+       . "-001B\n"         # not an Esc
+       . "-0080\t009F\n";  # not an ANSI 8-bit escape, including not CSI
+}
+
 # Return true if $str has a complete first line ending in \n and that line
 # is long enough to overwrite $n chars.
 sub _str_first_line_covers_n {
@@ -282,9 +317,11 @@ sub _str_first_line_covers_n {
   return ($gotlen >= $n);
 }
 
-# Truncate $str to fit in $limit columns.
-# The return is two values ($part, $cols) where $part is a leading portion
-# of $str and $cols is how many columns $part takes when printed.
+# _truncate() truncates $str to fit in $limit columns.
+#
+# The return is two values ($part, $cols).  $part is a leading portion of
+# $str (and possibly later ANSI escapes).  $cols is how many columns $part
+# takes when printed.
 #
 # For the common case of a run of single-width ascii chars, there's one
 # regexp match for the whole lot, then a second notices end of string.
@@ -292,7 +329,7 @@ sub _str_first_line_covers_n {
 # Text::CharWidth has some similar stuff for IsZero, IsDouble, etc, but
 # operates on locale byte strings rather than perl wide chars.  Not sure if
 # the width is supposed to be locale-dependent, or just character dependent.
-# Strictly speaking it'd depend on the tty anyway.
+# Strictly speaking it depends on the tty anyway.
 #
 sub _truncate {
   my ($str, $limit) = @_;
@@ -374,47 +411,13 @@ sub _truncate {
   return ($ret, $col);
 }
 
-# Zero-width char class.
-# CR treated as zero width in case it occurs as CRLF.
-#
-sub _IsZero {
-  return "+utf8::Me\n"  # mark, enclosing
-       . "+utf8::Mn\n"  # mark, non-spacing
-       . "+utf8::Cf\n"  # control, format
-       . "-00AD\n"      #    but exclude soft hyphen which is in Cf
-       . "+0007\n"      # BEL
-       . "+000D\n";     # CR, for our purposes
-}
-
-# Double-width char class, being East Asian "wide" and "full" chars.
-# Rumour has it this might be locale-dependent.  When turned into a
-# non-unicode charset there can be slightly different width rules, or
-# something like that.
-#
-sub _IsDouble {
-  return "+utf8::EastAsianWidth:W\n"
-       . "+utf8::EastAsianWidth:F\n";
-}
-
-# "Other" char class, being anything which doesn't introduce one of the
-# other regexp subexprs, and meaning in practice a single-width char.
-#
-sub _IsOther {
-  return "!PerlIO::via::EscStatus::_IsZero\n"
-       . "-PerlIO::via::EscStatus::_IsDouble\n"
-       . "-0009\n"         # not a Tab
-       . "-001B\n"         # not an Esc
-       . "-0080\t009F\n";  # not an ANSI 8-bit escape, including not CSI
-}
-
-# This _term_width() is a nasty hack for perl 5.10.0 where something dodgy
-# happens where PerlIO_findFILE() clears the :utf8 flag on a perlio layer.
-# This happens in the FILE* typemap as used by Term::Size, so a call to it
-# to get the width loses utf8 mode.  Not sure if clearing the flag is a bug
-# or a feature, if subsequent I/O goes through stdio alone then any encoding
-# transforms are lost so maybe bytes is correct.  In any case until
-# Term::Size uses PerlIO_fileno do it here with a temporary stream on the
-# fileno() of $fh to keep the original safe from harm.
+# This _term_width() is a nasty hack for perl 5.10.0 where PerlIO_findFILE()
+# as used by Term::Size 0.2 (through the "FILE*" typemap) clears the :utf8
+# flag on a perlio layer.  Not sure if that clearing is a bug or a feature.
+# It might be a feature in that you lose translations when going to raw
+# stdio.  In any case until Term::Size uses PerlIO_fileno() have a
+# workaround here with a temporary stream on a dup-ed fileno() of $fh to
+# keep the original safe from harm.
 #
 # There's probably plenty of other strategies for an idea of "print width"
 # on a stream.  Some sort of property of the whole stream, or per-layer,
@@ -457,7 +460,7 @@ PerlIO::via::EscStatus - dumb terminal status display layer
 =head1 DESCRIPTION
 
 An EscStatus layer prints and reprints a status line using carriage returns
-and backspaces, for a dumb terminal.  This is meant for a progress or status
+and backspaces for a dumb terminal.  This is meant as a progress or status
 display in a command line program.
 
     Working ... record 20 of 80 (25%)
@@ -482,8 +485,8 @@ plain C<print>, C<printf>, etc, and the layer takes care of what status is
 showing, to clear and redraw as necessary.
 
 The alternative is a special message printing function to do the clearing.
-If you're in full control of your ordinary output then that's fine (and is
-for instance how C<Term::ProgressBar> does it), but if you might have parts
+If you're in full control of your ordinary output then that's fine (for
+instance C<Term::ProgressBar> does it that way), but if you might have parts
 of a library or program only setup with plain C<print> then a layer is a
 good way to keep them from making a mess of the display.
 
@@ -509,16 +512,16 @@ each new line, so the next new status uses the new size.
 
 EscStatus follows the "utf8" flag of the layer below it when first pushed,
 allowing extended characters to be printed.  Often the layer below will be
-an C<":encoding"> for the user's terminal.  The difference in EscStatus is
-that utf8 multibyte sequences are recognised and the string width
-calculations made accordingly.  However changes to the utf8 layer flag after
-pushing are not recognised (see L</BUGS> below).
+an C<":encoding"> for the user's terminal.  The difference for EscStatus is
+in the string width calculations on utf8 multibyte sequences.  Note that
+changes to the utf8 layer flag after pushing don't work properly (see
+L</BUGS> below).
 
 For string width calculations tabs (C<\t>) are 8 spaces.  Various East Asian
 "double-width" characters take two columns.  BEL (C<\a>), ANSI escapes, and
 various unicode modifier characters take no space.  If a status line is
 truncated then all ANSI escapes are kept, so if say bold is turned on and
-off then the off is retained.
+off then the off escape is preserved.
 
 If a lower layer expands a character because it's unencodable on the final
 output then that's likely to make a mess of the width calculation.  For
@@ -576,15 +579,15 @@ empty status to clear, or to pop the EscStatus (erasing when popped works).
 
 If the utf8 flag on the stream is changed (by C<binmode>) EscStatus doesn't
 notice and will keep using the state when it was first pushed.  Perhaps this
-can change in the future (assuming there's sensible uses for turning it on
+will change in the future (assuming there's sensible uses for turning it on
 and off dynamically).
 
 As of Perl 5.10.0 an xsub using C<PerlIO_findFILE> like C<Term::Size>
 version 0.2 turns off the C<utf8> flag on the stream, preventing wide-char
-output.  EscStatus has a workaround for its use of C<Term::Size> and an
+output.  EscStatus has a workaround for its use of C<Term::Size> but an
 application might need to do the same.  The symptom is the usual "Wide
-character in print" warning (on a stream you thought you'd setup for wide
-output).
+character in print" warning (on a stream you thought you'd already set for
+wide output).
 
 =head1 SEE ALSO
 

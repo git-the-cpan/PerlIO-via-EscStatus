@@ -19,12 +19,11 @@
 
 use strict;
 use warnings;
+use Regexp::Common 'ANSIescape';
 use Test::More tests => 966;
 
-use Regexp::Common 'ANSIescape';
-
-ok ($Regexp::Common::ANSIescape::VERSION >= 2);
-ok (Regexp::Common::ANSIescape->VERSION  >= 2);
+ok ($Regexp::Common::ANSIescape::VERSION >= 3);
+ok (Regexp::Common::ANSIescape->VERSION  >= 3);
 
 
 ## no critic (ProhibitEscapedCharacters)

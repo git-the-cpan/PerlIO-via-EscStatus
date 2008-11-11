@@ -22,7 +22,7 @@ use Carp;
 use Regexp::Common ('no_defaults', # no $RE import
                     'pattern');    # pattern func
 
-our $VERSION = 2;
+our $VERSION = 3;
 
 ## no critic (ProhibitEscapedCharacters)
 
@@ -122,13 +122,13 @@ Regexp::Common::ANSIescape -- regexps for ANSI terminal escapes
 
 =head1 DESCRIPTION
 
-The ANSIescape pattern matches an ANSI terminal escape sequence like
+An ANSIescape pattern matches an ANSI terminal escape sequence like
 
-    Esc [ 3 0 ; 4 8 m           # CSI sequence
-    Esc U                       # C1 control
-    Esc _ APPSTRING Esc \       # C1 with string param
+    Esc[30;48m             # CSI sequence
+    EscU                   # C1 control
+    Esc_ APPSTRING Esc\    # C1 with string param
 
-    \x9B 3 0 m                  # ditto in 8-bit forms
+    \x9B 30m               # ditto in 8-bit forms
     \x85
     \x9F APPSTRING \x9C         
 

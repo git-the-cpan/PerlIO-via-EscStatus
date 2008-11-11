@@ -19,12 +19,11 @@
 
 use strict;
 use warnings;
+use PerlIO::via::EscStatus;
 use Test::More tests => 473;
 
-use PerlIO::via::EscStatus;
-
-ok ($PerlIO::via::EscStatus::VERSION >= 2);
-ok (PerlIO::via::EscStatus->VERSION  >= 2);
+ok ($PerlIO::via::EscStatus::VERSION >= 3);
+ok (PerlIO::via::EscStatus->VERSION  >= 3);
 
 
 #------------------------------------------------------------------------------
@@ -291,16 +290,13 @@ sub next_fd {
 #------------------------------------------------------------------------------
 # to string
 
+# only testing that it succeeds (the sublayers are already closed)
 {
- SKIP: {
-    if ($] < 5.008) { skip "due to no string opens in Perl $]", 1; }
-    my $buf = '';
-    open my $out, '>', \$buf or die;
-    binmode ($out, ':via(EscStatus)') or die;
-    print $out PerlIO::via::EscStatus::make_status('hello');
-    ok (close $out,
-        'close with status showing');
-  }
+  open my $out, '>', '/dev/null' or die;
+  binmode ($out, ':via(EscStatus)') or die;
+  print $out PerlIO::via::EscStatus::make_status('hello');
+  ok (close $out,
+      'close with status showing');
 }
 
 exit 0;

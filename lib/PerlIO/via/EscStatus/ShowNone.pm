@@ -21,7 +21,7 @@ use warnings;
 use PerlIO::via::EscStatus;
 use PerlIO::via::EscStatus::Parser;
 
-our $VERSION = 2;
+our $VERSION = 3;
 
 use constant DEBUG => 0;
 
@@ -60,10 +60,11 @@ PerlIO::via::EscStatus::ShowNone - suppress all status lines
 =head1 DESCRIPTION
 
 C<EscStatus::ShowNone> is a variant of the EscStatus layer which doesn't
-show any status lines coming through the stream, only the ordinary output.
-This can be used for a batch mode or non-interactive mode in a program.
+show any status lines coming through the stream at all, only the ordinary
+output.  This can be used for a batch mode or non-interactive mode in a
+program.
 
-Of course for batch mode it's also possible to simply not print statuses in
+Of course for batch mode it's also possible simply not to print statuses in
 the first place.  You can decide whether it's easier to check a mode flag at
 the print, or push a layer to strip what's printed.  A layer may be easier
 for suppressing prints from a library or independent parts of a program.
