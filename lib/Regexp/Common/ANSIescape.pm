@@ -1,4 +1,4 @@
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -22,7 +22,7 @@ use Carp;
 use Regexp::Common ('no_defaults', # no $RE import
                     'pattern');    # pattern func
 
-our $VERSION = 3;
+our $VERSION = 4;
 
 ## no critic (ProhibitEscapedCharacters)
 
@@ -80,7 +80,7 @@ pattern (name   => ['ANSIescape'],
            push @ret, (exists $flags->{-only7bit}   ? CSI_7BIT  # 7-bit only
                        : exists $flags->{-only8bit} ? CSI_8BIT  # 8-bit only
                        :                              CSI_7OR8) # 7bit or 8bit
-           . "(?k:[0-9;]*)(?k:[\x{20}-\x{2F}]*[\x{40}-\x{7E}])";
+           . "(?k:[\x{30}-\x{3F}]*)(?k:[\x{20}-\x{2F}]*[\x{40}-\x{7E}])";
 
            if (exists $flags->{-sepstring}) {
              if (! exists $flags->{-only8bit}) { push @ret, C1_ALL_7BIT; }
@@ -125,19 +125,51 @@ Regexp::Common::ANSIescape -- regexps for ANSI terminal escapes
 An ANSIescape pattern matches an ANSI terminal escape sequence like
 
     Esc[30;48m             # CSI sequence
+    Esc[?1h                # CSI with private params
     EscU                   # C1 control
     Esc_ APPSTRING Esc\    # C1 with string param
 
     \x9B 30m               # ditto in 8-bit forms
+    \x9B ?1h
     \x85
     \x9F APPSTRING \x9C         
 
-The 8-bit forms use bytes C<"\x80"> through C<"\x9F">.  Those bytes are
-unused in Unicode and the ISO-8859 character sets (Latin-1 etc), so the
-regexp won't match ordinary characters.  The C<-only7bit> option below can
-omit the 8-bit patterns if you're working with some other charset.  The
-7-bit patterns are all simply Esc followed by various combinations of
+The 7-bit patterns are simply Esc followed by various combinations of
 printable ASCII C<"\x20"> through C<"\x7E">.
+
+The 8-bit forms use bytes C<"\x80"> through C<"\x9F">.  The C<-only7bit>
+option below can omit the 8-bit patterns if they might have another
+meaning.
+
+=over 4
+
+=item *
+
+ISO-8859 character sets such as Latin-1 don't use C<\x80> through C<\x9F>,
+so they're free to be the ANSI escapes.
+
+=item *
+
+Unicode code points C<\x80> through C<\x9F> have the ANSI meaning, so Perl
+wide-char strings are fine (except on an EBCDIC system).
+
+=item *
+
+UTF-8 encoding uses bytes C<\x80> through C<\x9F> as intermediate parts of
+normal characters, so you must either decode to code points first, or use
+C<-only7bit>.
+
+=item *
+
+Other encodings may use C<\x80> through C<\x9F> as normal characters, for
+example DOS code page 1252.  Generally C<-only7bit> should be used in that
+case.
+
+=back
+
+The parameter part like "0" in "Esc[0m" can be any bytes 0x30 through 0x3F,
+so "private parameter" values like the VT100 "DECSET" extensions are
+matched.
 
 =head1 OPTIONS
 
@@ -147,16 +179,20 @@ printable ASCII C<"\x20"> through C<"\x7E">.
 
 =item C<{-only8bit}>
 
-Match only the 7-bit forms like C<"\eE">, or only the 8-bit forms like
-C<"\x{85}">.  The default is to match both.  The 7-bit forms are the most
-common.
+Match only the 7-bit forms like C<"\eE">.  Or match only the 8-bit forms
+like C<"\x{85}">.  The default is to match both.  The 7-bit forms are the
+most common.
 
 =item C<{-sepstring}>
 
-By default the string parameter to APC, DCS, OSC, PM and SOS sequences is
-included in the match, for example an APC like "\x{9F}Stringarg\x{9C}".
-With C<-sepstring> the pattern instead matches the "\x{9F}" and the
-terminator "\x{9C}" individually, leaving the C<Stringarg> unmatched.
+By default the string parameter to APC, DCS, OSC, PM and SOS is included in
+the match, for example an APC like
+
+    \x{9F}Stringarg\x{9C}
+
+is matched in its entirety.  With C<-sepstring> the pattern instead matches
+the start "\x{9F}" and the terminator "\x{9C}" individually, with the
+C<Stringarg> part unmatched.
 
 =item C<{-keep}>
 
@@ -171,14 +207,18 @@ The entire escape sequence.
 
 =item C<$2>
 
-The numeric parameters to a CSI sequence.  For example C<"\e[30;49m"> gives
-C<$2> as C<"30;49">.
+The parameters to a CSI sequence.  For example
+
+    \e[30;49m    ->   30;49      (SGR)
+    \e[?5h       ->   ?5         (DECSCNM extension)
 
 =item C<$3>
 
-Intermediate characters (if any) and final character of a CSI escape.  For
-example C<"\e[30m"> gives C<$3> as C<"m">, or with a "+" intermediate byte
-C<< "\e[30+P" >> gives C<$3> as C<< "+P" >>.
+The intermediate characters (if any) and final character of a CSI escape.  For
+example
+
+    \e[30m       ->   m
+    \e[30+P      ->   +P
 
 =back
 
@@ -197,7 +237,7 @@ L<http://www.geocities.com/user42_kevin/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 
-Copyright 2008 Kevin Ryde
+Copyright 2008, 2009 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

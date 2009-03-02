@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -20,10 +20,21 @@
 use strict;
 use warnings;
 use PerlIO::via::EscStatus;
-use Test::More tests => 473;
+use Test::More tests => 475;
 
-ok ($PerlIO::via::EscStatus::VERSION >= 3);
-ok (PerlIO::via::EscStatus->VERSION  >= 3);
+my $want_version = 4;
+ok ($PerlIO::via::EscStatus::VERSION >= $want_version,
+    'VERSION variable');
+ok (PerlIO::via::EscStatus->VERSION  >= $want_version,
+    'VERSION class method');
+ok (eval { PerlIO::via::EscStatus->VERSION($want_version); 1 },
+    "VERSION class check $want_version");
+{ my $check_version = $want_version + 1000;
+  ok (! eval { PerlIO::via::EscStatus->VERSION($check_version); 1 },
+      "VERSION class check $check_version");
+}
+
+## no critic (ProtectPrivateSubs)
 
 
 #------------------------------------------------------------------------------
@@ -35,6 +46,7 @@ my $_9B_str = "\x{9B}";
 my $_9F_str = "\x{9F}";
 my $AD_str  = "\x{AD}";
 
+diag '_IsZero';
 ok ("\a"       =~ /\p{PerlIO::via::EscStatus::_IsZero}/);
 ok ("\r"       =~ /\p{PerlIO::via::EscStatus::_IsZero}/);
 ok ("\t"       !~ /\p{PerlIO::via::EscStatus::_IsZero}/);
@@ -54,6 +66,7 @@ ok ("\x{FEFF}" =~ /\p{PerlIO::via::EscStatus::_IsZero}/); # BOM
 #------------------------------------------------------------------------------
 # _IsDouble
 
+diag '_IsDouble';
 ok ("\a"       !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
 ok ("\r"       !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
 ok ("\t"       !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
@@ -73,6 +86,7 @@ ok ("\x{FEFF}" !~ /\p{PerlIO::via::EscStatus::_IsDouble}/); # BOM
 #------------------------------------------------------------------------------
 # _IsOther
 
+diag '_IsOther';
 ok ("\a"       !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
 ok ("\r"       !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
 ok ("\t"       !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
@@ -90,7 +104,9 @@ ok ("\x{FEFF}" !~ /\p{PerlIO::via::EscStatus::_IsOther}/); # BOM
 
 
 #------------------------------------------------------------------------------
-# _trunc
+# _truncate
+
+diag '_truncate';
 
 # singles
 { my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ("", 0);
@@ -191,8 +207,8 @@ ok ("\x{FEFF}" !~ /\p{PerlIO::via::EscStatus::_IsOther}/); # BOM
   foreach my $i (0x20 .. 0x7F, 0xA0 .. 0xFF) {
     my $str = chr($i); # byte, without utf8 flag
     my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ($str, 1);
-    is ($trunc, $str);
-    is ($cols, 1);
+    is ($trunc, $str, "char $i passes");
+    is ($cols, 1, "char $i col width 1");
   }
 }
 
@@ -230,6 +246,8 @@ package main;
 use strict;
 use warnings;
 
+diag 'flush';
+
 # the first two here just to make sure the test framework is doing what it
 # should
 {
@@ -240,7 +258,7 @@ use warnings;
   $out->flush;
   is (PerlIO::via::MyLowlevel::saw_flush(),
       1,
-      'bare MyLowlevel sees flush call');
+      'bare MyLowlevel sees flush() call');
   close $out or die;
 }
 {
@@ -252,7 +270,7 @@ use warnings;
   $out->flush;
   is (PerlIO::via::MyLowlevel::saw_flush(),
       1,
-      'with encoding on top see flush call');
+      'with encoding on top see flush() call');
 
   close $out or die;
 }
@@ -265,7 +283,7 @@ use warnings;
   $out->flush;
   is (PerlIO::via::MyLowlevel::saw_flush(),
       1,
-      'with EscStatus on top see flush call');
+      'with EscStatus on top see flush() call');
   close $out or die;
 }
 
@@ -273,6 +291,8 @@ use warnings;
 #------------------------------------------------------------------------------
 # _term_width fd use
 
+# return the next available file descriptor number, ie. the one which would
+# be used by the next open() etc
 sub next_fd {
   require POSIX;
   my $next_fd = POSIX::dup(0);
@@ -280,23 +300,27 @@ sub next_fd {
   return $next_fd;
 }
 
+diag('_term_width');
 {
   my $fd1 = next_fd();
   PerlIO::via::EscStatus::_term_width (\*STDIN);
   my $fd2 = next_fd();
-  is ($fd1, $fd2);
+  is ($fd1, $fd2,
+     '_term_width leaves next_fd() unchanged');
 }
 
 #------------------------------------------------------------------------------
-# to string
+# close
 
-# only testing that it succeeds (the sublayers are already closed)
+# only testing that close succeeds (the sublayers are already closed)
+diag('close clearing');
 {
   open my $out, '>', '/dev/null' or die;
   binmode ($out, ':via(EscStatus)') or die;
   print $out PerlIO::via::EscStatus::make_status('hello');
   ok (close $out,
-      'close with status showing');
+      'close() with status showing');
 }
 
+diag('done');
 exit 0;

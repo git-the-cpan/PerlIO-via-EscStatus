@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -22,19 +22,37 @@ use strict;
 use warnings;
 use Test::More;
 
-if (eval { require ProgressMonitor; 1 }) {
-  plan tests => 4;
-} else {
-  plan skip_all => "ProgressMonitor not installed: $@";
+if (! eval { require ProgressMonitor }) {
+  plan skip_all => "ProgressMonitor package not available: $@";
 }
+plan tests => 8;
 
 require ProgressMonitor::Stringify::ToEscStatus;
-ok ($ProgressMonitor::Stringify::ToEscStatus::VERSION >= 3);
-ok (ProgressMonitor::Stringify::ToEscStatus->VERSION  >= 3);
 
-ok (ProgressMonitor::Stringify::ToEscStatus->new);
+my $want_version = 4;
+ok ($ProgressMonitor::Stringify::ToEscStatus::VERSION >= $want_version,
+    'VERSION variable');
+ok (ProgressMonitor::Stringify::ToEscStatus->VERSION  >= $want_version,
+    'VERSION class method');
+ok (eval { ProgressMonitor::Stringify::ToEscStatus->VERSION($want_version); 1},
+    "VERSION class check $want_version");
+{ my $check_version = $want_version + 1000;
+  ok(!eval{ProgressMonitor::Stringify::ToEscStatus->VERSION($check_version);1},
+     "VERSION class check $check_version");
+}
+{ my $te = ProgressMonitor::Stringify::ToEscStatus->new;
+  ok ($te->VERSION  >= $want_version, 'VERSION object method');
+  $te->VERSION ($want_version);
+  my $check_version = $want_version + 1000;
+  ok (! eval { $te->VERSION($check_version); 1 },
+      "VERSION object check $check_version");
+}
+  
+
+ok (ProgressMonitor::Stringify::ToEscStatus->new,
+    'creation');
 
 ok (! eval { ProgressMonitor::Stringify::ToEscStatus->new({stream=>123}); 1},
-    'bad stream file handle');
+    'not with bad "stream" file handle');
 
 exit 0;

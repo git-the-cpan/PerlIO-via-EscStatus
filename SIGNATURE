@@ -15,23 +15,24 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 COPYING
-SHA1 7cb7c1c31cd071788e31d0ab17f9b989fd1c0541 Changes
-SHA1 1bc6e3278af8bac78a4b0bbafcaaa24a0c46230f MANIFEST
-SHA1 6f046a8b5fb545f23230cb23d8dc5c53e6e791ed MANIFEST.SKIP
-SHA1 f66da721edec0780bfb71cfda927c84c1263adbf META.yml
-SHA1 d24078ad84f72b8510264cbdf55fb41e76061dd5 Makefile.PL
-SHA1 46472a398f6045d3b9e91c9cb927ac10f98f0c2d README
-SHA1 41b556524609ccd3296293e29f0fa162b46aea53 debian/changelog
+SHA1 efaec81d3dcc552b7f248f4a6a4e1986188c5647 Changes
+SHA1 a960afe42189f25c706f4b4e2d134e5067e6e47e MANIFEST
+SHA1 0f619f5ff37bc6da29711d44871fe11653ac42c1 MANIFEST.SKIP
+SHA1 ed2a994a2068b01087587d166c5bae1a303545a6 META.yml
+SHA1 51c659b25839c6df08b9264e1a8e45c8ea2a6d0f Makefile.PL
+SHA1 6f7ead115a03243928be9f4867ffb086371743b9 README
+SHA1 7eb6702165437a2f555533a43a21dd4ee6f32f4a debian/changelog
 SHA1 1b6453892473a467d07372d45eb05abc2031647a debian/compat
-SHA1 23b2db6c3c91380331a312a177c03bb98d5d5663 debian/control
-SHA1 257475ef52213feb7515d6d9e30b583a05c25f14 debian/copyright
+SHA1 77d98ebf26854861a65594ff5e52d9276e4839f8 debian/control
+SHA1 18ea2d1c2f8ab7fd8875e0da41073d02885a83a8 debian/copyright
 SHA1 31c8b21a893dc588eb98a271fb9b8e5eb7e210bc debian/rules
-SHA1 80af397cf44ab3129e40de9d130d664c848ee113 debian/watch
+SHA1 bfef3bb23efc44d0db6aaa8d2043b1cde098be30 debian/watch
 SHA1 44cc8d887b060aabdaa4663782fea3c8b872c70d devel/ansi.pl
 SHA1 f2273b093e3f843b4a25383ec03970539f753a24 devel/encoding.pl
+SHA1 c81276d6771294b868a119942ea39af1ba7bc941 devel/esc.pl
 SHA1 2fed2e3d17b9ffcf96cc545e4deee4a964915e78 devel/misc.pl
 SHA1 0b8aff1c9c0cb3ab88ef27db1e9d9f479c482e15 devel/non-match.pl
-SHA1 dfc081dfb7023df027f1650a25c374206ac1f8e1 devel/partial-end.pl
+SHA1 ff08f52b99e911a54d788ab12e340f79f05e01f4 devel/partial-end.pl
 SHA1 101619a935e09163c796330ea9f31d080f3ad472 devel/tostream.pl
 SHA1 0f80996d5de36419eb82a6ed93d97eee57c87a6d devel/unicode.pl
 SHA1 36ccc4d973bf8a68a0e6deef79f0c66ae91764d1 examples/colour.pl
@@ -40,24 +41,25 @@ SHA1 751ad8953ac7fe4c4fe3e2f23bfe320d94658d4a examples/fracs.pl
 SHA1 2c3ce6e5415957e8b9ed6c83506f7c6bb2dae49e examples/progressmonitor.pl
 SHA1 b3ff1a097971a652c95cd8ff864dcfccb3ebdc8b examples/showall.pl
 SHA1 2946c6d187bc790fe65a92bbf3f565f6337cb0ec examples/shownone.pl
-SHA1 8e8b4efd9361060b199debce27ca6665453eb480 examples/wide.pl
-SHA1 bd8d1983e0d718d89adfc3c764d4509f56ac6427 lib/PerlIO/via/EscStatus.pm
-SHA1 f85780df9e36a49b14776b55565228ee7aa07de4 lib/PerlIO/via/EscStatus/Parser.pm
-SHA1 0b3485486a85d4ba04d3dbdc95f6110ead14d0d8 lib/PerlIO/via/EscStatus/ShowAll.pm
-SHA1 090bcceedf35332c5284cf302e81e8122ae84fdf lib/PerlIO/via/EscStatus/ShowNone.pm
-SHA1 eb5dbfcd15ee6d63838b8937d1b2953474bf0406 lib/ProgressMonitor/Stringify/ToEscStatus.pm
-SHA1 0fe3fef58c49c95b36574a712c33d5d9dd4a5e94 lib/Regexp/Common/ANSIescape.pm
-SHA1 1868f0ad78264b1a7188e3b86e19ab9f4694c1b2 t/ANSIescape.t
-SHA1 60b51c3dc6d685f4fd3d60aae5a80158c4b79205 t/EscStatus.t
-SHA1 cbca80c66353911339a987cafbb22fe0d525eb61 t/Parser.t
-SHA1 d1b47e7f3e5f989b1dfff7fcf69910f553085b8b t/ShowAll.t
-SHA1 4219568f3ca675af673b575a0573e50e270acd4b t/ShowNone.t
-SHA1 667595b9fefb44e0fa7b80481120b9e2e670c2e6 t/ToEscStatus.t
+SHA1 089d1a39091c44e9a592563fa3f9764aab5180c3 examples/term-sprog.pl
+SHA1 ce4c9c48dbb4ef05cc4ea078eab279caed8a2244 examples/wide.pl
+SHA1 007db03418bdb3e36e46170a378e299bf615202e lib/PerlIO/via/EscStatus.pm
+SHA1 be489de0ae0ac5599d08ae83b7128d7a19b7b6f3 lib/PerlIO/via/EscStatus/Parser.pm
+SHA1 1b461c03606a97ea6b0a12322fd08e1d4b1a0557 lib/PerlIO/via/EscStatus/ShowAll.pm
+SHA1 8c5164bee426d34d0deb683a6ea7efc87e054161 lib/PerlIO/via/EscStatus/ShowNone.pm
+SHA1 c5e4128433138daf7ba136d91ff5e228b6aa52ee lib/ProgressMonitor/Stringify/ToEscStatus.pm
+SHA1 9d6c65390a1b6ed36a86f4527af7a5c680b5a7a3 lib/Regexp/Common/ANSIescape.pm
+SHA1 8845843b27891a6347e3b119761172110b7a11b7 t/ANSIescape.t
+SHA1 8be9150399802bf6717cda2803bab8b86858b271 t/EscStatus.t
+SHA1 1d5d89b2bea5a088b078b9ec93f284ddc5361f86 t/Parser.t
+SHA1 940cc5fdada266f283f5a0edb639507a084a6951 t/ShowAll.t
+SHA1 3c7b9a302d05e331917d14131830f0f8195a1172 t/ShowNone.t
+SHA1 0abd07339f976da3489e026eedbc7c784a50270c t/ToEscStatus.t
 SHA1 a661a39e55a4127aecb1b97a631c4f01f7dce8c6 t/pod.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.9 (GNU/Linux)
 
-iD8DBQFJGMahLFMCIV9q3ToRAstlAJ47o7qmDQc2RKSxLMiLN1AtJ0T8XgCgmZ3O
-ybIWXnP7TrYiY/JgU72+CwU=
-=qrQb
+iD8DBQFJrD7YLFMCIV9q3ToRAjRLAKCWRRmbFj2sXCxIls6T5wqzJv7jmACeIix4
+lTcHmLjAtVLNRqWd56ggjFk=
+=lNLx
 -----END PGP SIGNATURE-----

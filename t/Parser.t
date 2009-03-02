@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -20,11 +20,21 @@
 use strict;
 use warnings;
 use PerlIO::via::EscStatus::Parser;
-use Test::More tests => 38;
+use Test::More tests => 40;
 use charnames ':full';
 
-ok ($PerlIO::via::EscStatus::Parser::VERSION >= 3);
-ok (PerlIO::via::EscStatus::Parser->VERSION  >= 3);
+my $want_version = 4;
+ok ($PerlIO::via::EscStatus::Parser::VERSION >= $want_version,
+    'VERSION variable');
+ok (PerlIO::via::EscStatus::Parser->VERSION  >= $want_version,
+    'VERSION class method');
+ok (eval { PerlIO::via::EscStatus::Parser->VERSION($want_version); 1 },
+    "VERSION class check $want_version");
+{ my $check_version = $want_version + 1000;
+  ok (! eval { PerlIO::via::EscStatus::Parser->VERSION($check_version); 1 },
+      "VERSION class check $check_version");
+}
+
 
 require PerlIO::via::EscStatus;
 my $ESS = PerlIO::via::EscStatus::ESCSTATUS_STR();

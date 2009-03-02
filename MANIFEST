@@ -8,6 +8,7 @@ debian/rules
 debian/watch
 devel/ansi.pl
 devel/encoding.pl
+devel/esc.pl
 devel/misc.pl
 devel/non-match.pl
 devel/partial-end.pl
@@ -19,6 +20,7 @@ examples/fracs.pl
 examples/progressmonitor.pl
 examples/showall.pl
 examples/shownone.pl
+examples/term-sprog.pl
 examples/wide.pl
 lib/PerlIO/via/EscStatus.pm
 lib/PerlIO/via/EscStatus/Parser.pm

@@ -18,39 +18,36 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Usage: ./partial-end.pl
-#
-# Form and print to stdout the hairy ESCSTATUS_STR_PARTIAL_REGEXP used in
-# PerlIO::via::EscStatus::Parser.  As described there it's the ESCSTATUS_STR
-# in $str matched in its entirety anywhere, or a prefix part of it at the
-# end of the target match string.
-#
-
 use strict;
 use warnings;
+use Encode;
+use Regexp::Common 'ANSIescape';
 
-my $str = "\e_EscStatus\e\\";
+use Data::Dumper;
+$Data::Dumper::Useqq = 1;
 
-sub regexp_literal_char {
-  my ($c) = @_;
-  if ($c eq "\e") {
-    return "\\e";  # printable form
-  } else {
-    return quotemeta($c);
-  }
-}
+print "\e_hello\e\\world\n";
 
-sub partial_end {
-  my ($str, $level) = @_;
+# print the regexp, to show how diabolical it looks
+my $re = $RE{ANSIescape}{-keep};
+print "\n",Dumper(\"$re");
+$re = $RE{ANSIescape}{-only7bit}{-keep};
+print "\n",Dumper(\"$re");
 
-  my $ret = regexp_literal_char (substr ($str, 0, 1));
+my $str = "\x{9B}";
+utf8::upgrade($str);
+print "\n",Dumper(\$str);
+my $utf8 = Encode::encode('utf-8',$str);
+for my $i (0 .. length($utf8)-1) { printf "%02X ", ord(substr($utf8,$i)); }
+print "\n";
 
-  for (my $i = 1; $i < length($str); $i++) {
-    my $c = substr ($str, $i, 1);
-    $ret .= '(?:$|' . regexp_literal_char ($c);
-  }
-  $ret .= (')' x (length($str)-1));
-}
+$str = "\x{19B}";
+utf8::upgrade($str);
+print "\n",Dumper(\$str);
+my $utf8 = Encode::encode('utf-8',$str);
+for my $i (0 .. length($utf8)-1) { printf "%02X ", ord(substr($utf8,$i)); }
+print "\n";
 
-print partial_end($str),"\n";
-exit 0;
+print $utf8,"\n";
+
+print "\x{9B}43myellow back\x{9B}0m\n";

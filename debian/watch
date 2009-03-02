@@ -23,4 +23,4 @@
 # test with: uscan --report --verbose --watchfile=debian/watch
 
 version=3
-http://www.geocities.com/user42_kevin/perlio-via-escstatus/PerlIO-via-EscStatus-([0-9]+)\.tar\.gz\.bin
+http://www.geocities.com/user42_kevin/perlio-via-escstatus/PerlIO-via-EscStatus-([0-9]+)\.tgz

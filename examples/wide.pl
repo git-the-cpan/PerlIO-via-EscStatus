@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -25,8 +25,8 @@
 # 200 chars long, which will print as 400 columns, and it's truncated to fit
 # in 80 columns (or however wide your terminal is).
 #
-# You'll need a unicode tty with asian fonts to see this properly, "uxterm"
-# for example.
+# You'll need a unicode tty with asian fonts to see this properly,
+# eg. "uxterm".
 #
 
 use strict;

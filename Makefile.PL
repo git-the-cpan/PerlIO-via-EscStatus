@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -18,7 +18,9 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
-require 5.006; # for "our" and more
+# actually suspect it's 5.8.4 or some such before all the char classes and
+# perlio goes well enough ...
+use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -34,19 +36,30 @@ WriteMakefile
                     
                     'Regexp::Common' => 0,
                     'Term::Size' => 0,
+                    'Encode' => 0,
+                    'List::Util' => 0,
+
+                    # only for the ProgressMonitor bit actually
+                    'Scalar::Util' => 0,
+
+                    # tests
+                    'Test::More' => 0,
+                    'File::Temp' => 0,
                    },
    AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
    LICENSE      => 'gpl',
    SIGN         => 1,
 
-# recommends:
-#     ProgressMonitor: 0
    EXTRA_META => <<'HERE',
+recommends:
+    Test::Pod: 1.00
+    ProgressMonitor: 0
 no_index:
     directory:
         - devel
 resources:
     homepage: http://www.geocities.com/user42_kevin/perlio-via-escstatus/index.html
+    license: http://www.gnu.org/licenses/#GPL
 HERE
   );
 
@@ -56,9 +69,11 @@ sub MY::postamble {
 LINT_FILES = $(TO_INST_PM) t/*.t examples/*.pl devel/*.pl
 lint:
 	perl -MO=Lint $(LINT_FILES)
-	podchecker    $(LINT_FILES)
 pc:
+	-podchecker $(LINT_FILES)
 	perlcritic $(LINT_FILES)
+unused:
+	for i in $(LINT_FILES); do perl -Mwarnings::unused -I lib $$i; done
 
 myman:
 	mv MANIFEST MANIFEST.old
@@ -70,13 +85,13 @@ myman:
 copyright-years-check:
 	year=`date +%Y`; \
 	tar tvfz $(DISTVNAME).tar.gz \
-	| grep $$year- \
+	| egrep '$$year-|debian/copyright' \
 	| sed 's:^.*$(DISTVNAME)/::' \
 	| (result=0; \
 	  while read i; do \
 	    case $$i in \
 	      '' | */ \
-	      | debian/changelog | debian/compat | debian/control \
+	      | debian/changelog | debian/compat \
 	      | t/pod.t \
 	      | COPYING | MANIFEST* | SIGNATURE | META.yml) \
 	      continue ;; \

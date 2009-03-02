@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -20,10 +20,19 @@
 use strict;
 use warnings;
 use Regexp::Common 'ANSIescape';
-use Test::More tests => 966;
+use Test::More tests => 976;
 
-ok ($Regexp::Common::ANSIescape::VERSION >= 3);
-ok (Regexp::Common::ANSIescape->VERSION  >= 3);
+my $want_version = 4;
+ok ($Regexp::Common::ANSIescape::VERSION >= $want_version,
+    'VERSION variable');
+ok (Regexp::Common::ANSIescape->VERSION  >= $want_version,
+    'VERSION class method');
+ok (eval { Regexp::Common::ANSIescape->VERSION($want_version); 1 },
+    "VERSION class check $want_version");
+{ my $check_version = $want_version + 1000;
+  ok (! eval { Regexp::Common::ANSIescape->VERSION($check_version); 1 },
+      "VERSION class check $check_version");
+}
 
 
 ## no critic (ProhibitEscapedCharacters)
@@ -35,7 +44,7 @@ ok (Regexp::Common::ANSIescape->VERSION  >= 3);
       $count++;
     }
   }
-  is ($count, 31);
+  is ($count, 31, 'C1_ALL_7BIT');
 }
 { my $count = 0;
   foreach my $i (0x80 .. 0x9F) {
@@ -44,7 +53,7 @@ ok (Regexp::Common::ANSIescape->VERSION  >= 3);
       $count++;
     }
   }
-  is ($count, 31);
+  is ($count, 31, 'C1_ALL_8BIT');
 }
 { my $s_count = 0;
   my $n_count = 0;
@@ -52,12 +61,13 @@ ok (Regexp::Common::ANSIescape->VERSION  >= 3);
     my $str = "\e".chr($i);
     my $s = ($str =~ Regexp::Common::ANSIescape::C1_STR_7BIT);
     my $n = ($str =~ Regexp::Common::ANSIescape::C1_NST_7BIT);
-    ok (! ($s && $n));
+    ok (! ($s && $n),
+       'C1_STR_7BIT and C1_NST_7BIT mutually exclusive');
     if ($s) { $s_count++; }
     if ($n) { $n_count++; }
   }
-  is ($s_count, 5);
-  is ($n_count, 26);
+  is ($s_count, 5,  'C1_STR_7BIT');
+  is ($n_count, 26, 'C1_NST_7BIT');
 }
 { my $s_count = 0;
   my $n_count = 0;
@@ -65,31 +75,49 @@ ok (Regexp::Common::ANSIescape->VERSION  >= 3);
     my $str = chr($i);
     my $s = ($str =~ Regexp::Common::ANSIescape::C1_STR_8BIT);
     my $n = ($str =~ Regexp::Common::ANSIescape::C1_NST_8BIT);
-    ok (! ($s && $n));
+    ok (! ($s && $n),
+       'C1_STR_8BIT and C1_NST_8BIT mutually exclusive');
     if ($s) { $s_count++; }
     if ($n) { $n_count++; }
   }
-  is ($s_count, 5);
-  is ($n_count, 26);
+  is ($s_count, 5,  'C1_STR_8BIT');
+  is ($n_count, 26, 'C1_NST_8BIT');
 }
 
-{ my $str = "zz\e[34mmm";  # SGR
-  ok ($str =~ $RE{ANSIescape}{-keep});
-  is ($1, "\e[34m");
-  is ($2, "34");
-  is ($3, "m");
+{ my $name = 'SGR';
+  my $str = "zz\e[34mmm";
+  ok ($str =~ $RE{ANSIescape}{-keep}, "$name -- match");
+  is ($1, "\e[34m", "$name -- capture 1");
+  is ($2, "34", "$name -- capture 2");
+  is ($3, "m", "$name -- capture 3");
 }
-{ my $str = "zz\e[0 mzz";  # SGR with space flag
-  ok ($str =~ $RE{ANSIescape}{-keep});
-  is ($1, "\e[0 m");
-  is ($2, "0");
-  is ($3, " m");
+{ my $name = 'SGR with space flag';
+  my $str = "zz\e[0 mzz";
+  ok ($str =~ $RE{ANSIescape}{-keep}, "$name -- match");
+  is ($1, "\e[0 m", "$name -- capture 1");
+  is ($2, "0", "$name -- capture 2");
+  is ($3, " m", "$name -- capture 3");
 }
-{ my $str = "zz\e[1;2;3\x{20}\x{21}\x{22}\x{23}\x{24}\x{25}\x{26}\x{27}\x{28}\x{29}\x{2A}\x{2B}\x{2C}\x{2D}\x{2E}\x{2F}mmm";  # SGR with zany flags
-  ok ($str =~ $RE{ANSIescape}{-keep});
-  is ($1, "\e[1;2;3\x{20}\x{21}\x{22}\x{23}\x{24}\x{25}\x{26}\x{27}\x{28}\x{29}\x{2A}\x{2B}\x{2C}\x{2D}\x{2E}\x{2F}m");
-  is ($2, "1;2;3");
-  is ($3, "\x{20}\x{21}\x{22}\x{23}\x{24}\x{25}\x{26}\x{27}\x{28}\x{29}\x{2A}\x{2B}\x{2C}\x{2D}\x{2E}\x{2F}m");
+{ my $name = 'DECSCNM private param to SM';
+  my $str = "zz\e[?5hzz";
+  ok ($str =~ $RE{ANSIescape}{-keep}, "$name -- match");
+  is ($1, "\e[?5h", "$name -- capture 1");
+  is ($2, "?5", "$name -- capture 2");
+  is ($3, "h", "$name -- capture 3");
+}
+{ my $name = 'SGR with crazy flags';
+  my $str = "zz\e[1;2;3\x{20}\x{21}\x{22}\x{23}\x{24}\x{25}\x{26}\x{27}\x{28}\x{29}\x{2A}\x{2B}\x{2C}\x{2D}\x{2E}\x{2F}mmm";
+  ok ($str =~ $RE{ANSIescape}{-keep}, "$name -- match");
+  is ($1, "\e[1;2;3\x{20}\x{21}\x{22}\x{23}\x{24}\x{25}\x{26}\x{27}\x{28}\x{29}\x{2A}\x{2B}\x{2C}\x{2D}\x{2E}\x{2F}m", "$name -- capture 1");
+  is ($2, "1;2;3", "$name -- capture 2");
+  is ($3, "\x{20}\x{21}\x{22}\x{23}\x{24}\x{25}\x{26}\x{27}\x{28}\x{29}\x{2A}\x{2B}\x{2C}\x{2D}\x{2E}\x{2F}m", "$name -- capture 3");
+}
+{ my $name = 'SGR with crazy parameter string';
+  my $str = "zz\e[\x{30}\x{31}\x{32}\x{33}\x{34}\x{35}\x{36}\x{37}\x{38}\x{39}\x{3A}\x{3B}\x{3C}\x{3D}\x{3E}\x{3F}\x{30}mmm";
+  ok ($str =~ $RE{ANSIescape}{-keep}, "$name -- match");
+  is ($1, "\e[\x{30}\x{31}\x{32}\x{33}\x{34}\x{35}\x{36}\x{37}\x{38}\x{39}\x{3A}\x{3B}\x{3C}\x{3D}\x{3E}\x{3F}\x{30}m", "$name -- capture 1");
+  is ($2, "\x{30}\x{31}\x{32}\x{33}\x{34}\x{35}\x{36}\x{37}\x{38}\x{39}\x{3A}\x{3B}\x{3C}\x{3D}\x{3E}\x{3F}\x{30}", "$name -- capture 2");
+  is ($3, "m", "$name -- capture 3");
 }
 
 
@@ -161,12 +189,11 @@ foreach my $elem ([$RE{ANSIescape}{-sepstring}{-only8bit}, 'sep8',
 
   my ($re, $name, $strs) = @$elem;
   require Data::Dumper;
-  # print "$re\n";
+  # diag "$re";
 
   foreach my $str (@$strs) {
-    my $dumper = Data::Dumper->new ([$str],['str']);
-    $dumper->Useqq(1);
-    my $printstr = $dumper->Dump;
+    my $printstr = Data::Dumper->new([$str],['str'])->Useqq(1)->Dump;
+    $printstr =~ s/\n+$//; # no trailing newlines in test name
 
     ok ($str =~ $re,           "$name match $printstr");
     is ($-[0], 2,              "$name match begin $printstr");

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -21,10 +21,20 @@ use 5.006;  # 3-arg open
 use strict;
 use warnings;
 use PerlIO::via::EscStatus::ShowNone;
-use Test::More tests => 4;
+use Test::More tests => 6;
 
-ok ($PerlIO::via::EscStatus::ShowNone::VERSION >= 3);
-ok (PerlIO::via::EscStatus::ShowNone->VERSION  >= 3);
+my $want_version = 4;
+ok ($PerlIO::via::EscStatus::ShowNone::VERSION >= $want_version,
+    'VERSION variable');
+ok (PerlIO::via::EscStatus::ShowNone->VERSION  >= $want_version,
+    'VERSION class method');
+ok (eval { PerlIO::via::EscStatus::ShowNone->VERSION($want_version); 1 },
+    "VERSION class check $want_version");
+{ my $check_version = $want_version + 1000;
+  ok (! eval { PerlIO::via::EscStatus::ShowNone->VERSION($check_version); 1 },
+      "VERSION class check $check_version");
+}
+
 
 sub slurp {
   my ($filename) = @_;
