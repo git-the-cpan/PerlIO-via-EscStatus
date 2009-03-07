@@ -21,7 +21,7 @@ use warnings;
 use PerlIO::via::EscStatus;
 use PerlIO::via::EscStatus::Parser;
 
-our $VERSION = 4;
+our $VERSION = 5;
 
 use constant DEBUG => 0;
 

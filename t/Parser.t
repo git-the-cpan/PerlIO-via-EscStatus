@@ -23,7 +23,7 @@ use PerlIO::via::EscStatus::Parser;
 use Test::More tests => 40;
 use charnames ':full';
 
-my $want_version = 4;
+my $want_version = 5;
 ok ($PerlIO::via::EscStatus::Parser::VERSION >= $want_version,
     'VERSION variable');
 ok (PerlIO::via::EscStatus::Parser->VERSION  >= $want_version,

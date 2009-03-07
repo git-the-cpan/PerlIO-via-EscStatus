@@ -20,9 +20,9 @@
 use strict;
 use warnings;
 use PerlIO::via::EscStatus;
-use Test::More tests => 475;
+use Test::More tests => 476;
 
-my $want_version = 4;
+my $want_version = 5;
 ok ($PerlIO::via::EscStatus::VERSION >= $want_version,
     'VERSION variable');
 ok (PerlIO::via::EscStatus->VERSION  >= $want_version,
@@ -301,9 +301,9 @@ sub next_fd {
 }
 
 diag('_term_width');
-{
+foreach my $fh (\*STDOUT, \*STDERR) {
   my $fd1 = next_fd();
-  PerlIO::via::EscStatus::_term_width (\*STDIN);
+  PerlIO::via::EscStatus::_term_width ($fh);
   my $fd2 = next_fd();
   is ($fd1, $fd2,
      '_term_width leaves next_fd() unchanged');

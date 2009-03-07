@@ -22,7 +22,7 @@ use warnings;
 use ProgressMonitor::State qw(STATE_DONE);
 use PerlIO::via::EscStatus;
 
-our $VERSION = 4;
+our $VERSION = 5;
 
 use classes
   extends => 'ProgressMonitor::Stringify::AbstractMonitor',

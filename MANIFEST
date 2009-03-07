@@ -12,6 +12,7 @@ devel/esc.pl
 devel/misc.pl
 devel/non-match.pl
 devel/partial-end.pl
+devel/property.pl
 devel/tostream.pl
 devel/unicode.pl
 examples/colour.pl

@@ -23,7 +23,7 @@ use warnings;
 use PerlIO::via::EscStatus::ShowNone;
 use Test::More tests => 6;
 
-my $want_version = 4;
+my $want_version = 5;
 ok ($PerlIO::via::EscStatus::ShowNone::VERSION >= $want_version,
     'VERSION variable');
 ok (PerlIO::via::EscStatus::ShowNone->VERSION  >= $want_version,

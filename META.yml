@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                PerlIO-via-EscStatus
-version:             4
+version:             5
 abstract:            Printing a status line through an I/O layer.
 license:             gpl
 author:              
@@ -22,6 +22,18 @@ meta-spec:
 recommends:
     Test::Pod: 1.00
     ProgressMonitor: 0
+optional_features:
+    maximum_tests:
+        description: Have "make test" do as much as possible.
+        requires:
+            Test::Pod: 1.00
+    maximum_examples:
+        description: Be able to run all the example programs.
+        requires:
+            ProgressMonitor: 0
+            Term::ANSIColor: 0
+            Term::Sprog: 0
+            Time::HiRes: 0
 no_index:
     directory:
         - devel

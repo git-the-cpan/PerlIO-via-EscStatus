@@ -18,9 +18,8 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# actually suspect it's 5.8.4 or some such before all the char classes and
-# perlio goes well enough ...
-use 5.006;
+# 5.8.5 for unicode properties ...
+use 5.8.5;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -54,6 +53,18 @@ WriteMakefile
 recommends:
     Test::Pod: 1.00
     ProgressMonitor: 0
+optional_features:
+    maximum_tests:
+        description: Have "make test" do as much as possible.
+        requires:
+            Test::Pod: 1.00
+    maximum_examples:
+        description: Be able to run all the example programs.
+        requires:
+            ProgressMonitor: 0
+            Term::ANSIColor: 0
+            Term::Sprog: 0
+            Time::HiRes: 0
 no_index:
     directory:
         - devel

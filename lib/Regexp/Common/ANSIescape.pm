@@ -22,7 +22,7 @@ use Carp;
 use Regexp::Common ('no_defaults', # no $RE import
                     'pattern');    # pattern func
 
-our $VERSION = 4;
+our $VERSION = 5;
 
 ## no critic (ProhibitEscapedCharacters)
 

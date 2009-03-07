@@ -22,7 +22,7 @@ use warnings;
 use Regexp::Common 'ANSIescape';
 use Test::More tests => 976;
 
-my $want_version = 4;
+my $want_version = 5;
 ok ($Regexp::Common::ANSIescape::VERSION >= $want_version,
     'VERSION variable');
 ok (Regexp::Common::ANSIescape->VERSION  >= $want_version,

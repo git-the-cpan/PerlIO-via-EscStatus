@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License along
 with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 5, March 2009
+    - avoid a segv from Term::Size in the test suite
+
 Version 4, March 2009
     - recognise "private parameters" in ANSI sequences,
       reported by Karl Gaissmaier

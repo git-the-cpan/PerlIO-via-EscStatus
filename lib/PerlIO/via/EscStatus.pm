@@ -16,7 +16,7 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 package PerlIO::via::EscStatus;
-use 5.006; # 3-arg open
+use 5.008005; # for unicode properties
 use strict;
 use warnings;
 use Carp;
@@ -32,7 +32,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use PerlIO::via::EscStatus::Parser;
 use Regexp::Common 'ANSIescape';
 
-our $VERSION = 4;
+our $VERSION = 5;
 
 # set this to 1 or 2 for some diagnostics to STDERR
 use constant DEBUG => 0;
@@ -124,7 +124,7 @@ sub UTF8 {
 #
 # As of Perl 5.10.0 CLOSE is called after PerlIO::via has closed the
 # sublayers (with PerlIOBase_close()) sublayers in $fh, so unfortunately
-# it's too late to print an _erase_status().  There's FLUSH call from
+# it's too late to print an _erase_status().  There's a FLUSH call from
 # PerlIOBase_close() just before the close, but there's no obvious way to
 # tell it's the last-ever flush.
 #
@@ -278,35 +278,32 @@ sub WRITE {
 # Zero-width char class.
 # CR treated as zero width in case it occurs as CRLF.
 #
-sub _IsZero {
-  return "+utf8::Me\n"  # mark, enclosing
-       . "+utf8::Mn\n"  # mark, non-spacing
-       . "+utf8::Cf\n"  # control, format
-       . "-00AD\n"      #    but exclude soft hyphen which is in Cf
-       . "+0007\n"      # BEL
-       . "+000D\n";     # CR, for our purposes
-}
+use constant _IsZero =>
+    "+utf8::Me\n"  # mark, enclosing
+  . "+utf8::Mn\n"  # mark, non-spacing
+  . "+utf8::Cf\n"  # control, format
+  . "-00AD\n"      #    but exclude soft hyphen which is in Cf
+  . "+0007\n"      # BEL
+  . "+000D\n";     # CR, for our purposes
 
 # Double-width char class, being East Asian "wide" and "full" chars.
 # Rumour has it this might be locale-dependent.  When turned into a
 # non-unicode charset there can be slightly different width rules, or
 # something like that.
 #
-sub _IsDouble {
-  return "+utf8::EastAsianWidth:W\n"
-       . "+utf8::EastAsianWidth:F\n";
-}
+use constant _IsDouble =>
+    "+utf8::EastAsianWidth:W\n"
+  . "+utf8::EastAsianWidth:F\n";
 
 # "Other" char class, being anything which doesn't introduce one of the
 # other regexp subexprs, and meaning in practice a single-width char.
 #
-sub _IsOther {
-  return "!PerlIO::via::EscStatus::_IsZero\n"
-       . "-PerlIO::via::EscStatus::_IsDouble\n"
-       . "-0009\n"         # not a Tab
-       . "-001B\n"         # not an Esc
-       . "-0080\t009F\n";  # not an ANSI 8-bit escape, including not CSI
-}
+use constant _IsOther =>
+    "!PerlIO::via::EscStatus::_IsZero\n"
+  . "-PerlIO::via::EscStatus::_IsDouble\n"
+  . "-0009\n"         # not a Tab
+  . "-001B\n"         # not an Esc
+  . "-0080\t009F\n";  # not an ANSI 8-bit escape, including not CSI
 
 # Return true if $str has a complete first line ending in \n and that line
 # is long enough to overwrite $n chars.
@@ -320,7 +317,7 @@ sub _str_first_line_covers_n {
 # _truncate() truncates $str to fit in $limit columns.
 #
 # The return is two values ($part, $cols).  $part is a leading portion of
-# $str (and possibly later ANSI escapes).  $cols is how many columns $part
+# $str, and possibly later ANSI escapes.  $cols is how many columns $part
 # takes when printed.
 #
 # For the common case of a run of single-width ascii chars, there's one
@@ -343,7 +340,7 @@ sub _truncate {
                   |($RE{ANSIescape})  # $5
                   |\p{_IsOther}+
                   |.                  # plain Esc, either non-ANSI or malformed
-                  )/gxo) {
+                  )/gxo) {  # o -- compile $RE once
     my $part = $1;
     if (DEBUG >= 2) { require Data::Dumper;
                       my $dumper = Data::Dumper->new ([$part]);
@@ -412,7 +409,7 @@ sub _truncate {
 }
 
 # This _term_width() is a nasty hack for perl 5.10.0 where PerlIO_findFILE()
-# as used by Term::Size 0.2 (through the "FILE*" typemap) clears the :utf8
+# as used by Term::Size 0.2, through the "FILE*" typemap, clears the :utf8
 # flag on a perlio layer.  Not sure if that clearing is a bug or a feature.
 # It might be a feature in that you lose translations when going to raw
 # stdio.  In any case until Term::Size uses PerlIO_fileno() have a
@@ -424,12 +421,17 @@ sub _truncate {
 # which could be overridden when you want wider or narrower output no matter
 # what the underlying fd claims (eg. from a "COLUMNS" envvar) ...
 #
+# Note: If $fh is only for read then '>&' mode makes $tmp give a FILE* as
+# NULL, which seg-faults with Term::Size 0.2.  Should be output-only in the
+# uses from WRITE, but wouldn't mind guarding against that, or depending on
+# a better Term::Size.
+#
 sub _term_width {
   my ($fh) = @_;
   my $width;
   my $fd = fileno($fh);
   if (DEBUG >= 2) { print STDERR "_term_width on fd=",
-                      defined $fd ? $fd : 'undef',"\n"; }
+                      (defined $fd ? $fd : 'undef'), "\n"; }
   if (defined $fd) {
     if (open my $tmp, '>&', $fd) {
       $width = Term::Size::chars($tmp);
@@ -572,7 +574,7 @@ delay.
 When the stream is closed the status shown by EscStatus is not erased.  This
 is because C<PerlIO::via> closes the sublayers first.  Perhaps that can
 change in the future.  The suggestion when closing is to either print an
-empty status to clear, or to pop the EscStatus (erasing when popped works).
+empty status to clear, or to pop the EscStatus (erasing works when popped).
 
     print_status ('');
     close STDOUT;  # or "exit 0" or whatever

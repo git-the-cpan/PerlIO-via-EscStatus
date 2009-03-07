@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -25,9 +25,34 @@ use Encode qw(:fallbacks);
 use PerlIO::via::EscStatus ('ESCSTATUS_STR');
 use charnames ':full';
 
+# use Term::Size;
+# { my $fh = \*STDOUT;
+#   print "tty size ", Term::Size::chars($fh), "\n";
+#   print "tty width ",PerlIO::via::EscStatus::_term_width($fh),"\n";
+# }
+# { open my $fh, '>', '/dev/null' or die;
+#   print "null size ", Term::Size::chars($fh), "\n";
+# 
+# #   my $width;
+# #   my $fd = fileno($fh);
+# #   print STDERR "_term_width on fd=", (defined $fd ? $fd : 'undef'),"\n";
+# #   if (defined $fd) {
+# #     if (open my $tmp, '>&', $fd) {
+# #       print "tmp fh $tmp\n";
+# #       $width = Term::Size::chars($tmp);
+# #       close $tmp;
+# #     }
+# #   }
+# #   print "dup ", $width,"\n";
+# 
+#   print "null width ",PerlIO::via::EscStatus::_term_width($fh),"\n";
+# }
+
+
 {
   # binmode (STDOUT, ":utf8");
 
+  no warnings 'once';
   $PerlIO::encoding::fallback = FB_PERLQQ;
   binmode (STDOUT, ":encoding(iso-8859-1)");
 
@@ -71,7 +96,7 @@ use charnames ':full';
   print "$esc";
   print "\N{LATIN SMALL LETTER A WITH CIRCUMFLEX}\n";
   sleep 1;
-#  print "${esc}ab\n";
+  #  print "${esc}ab\n";
   sleep 1;
   close STDOUT;
 
