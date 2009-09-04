@@ -18,43 +18,51 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Usage: ./term-sprog.pl
+# Usage: ./term-sk.pl
 #
-# This is a bit of fun putting Term::Sprog status strings through EscStatus.
+# This is some fun putting Term::Sk status strings through EscStatus.
 #
-# Normally Term::Sprog prints its own backspace overwriting, but you can get
-# strings with $sprog->get_line, strip off the backspacing, and put it
-# through EscStatus.
+# Term::Sk makes progress status strings from a "%" style format string and
+# current and target numbers.  Normally Sk prints the result with its own
+# backspace overwriting, but in "quiet" mode you can instead get the strings
+# with $sk->get_line, strip off the backspacing, and show them through
+# EscStatus.
 #
-# The "freq" parameter doesn't apply when using $sprog->get_line, you have
+# $sk->whisper can still be used.  Sk knows it hasn't printed a status line
+# itself (with $sk->show), so $sk->whisper is just a plain print, which
+# EscStatus then takes care of.
+#
+# The Sk "freq" parameter doesn't apply when using $sk->get_line.  You have
 # to manage output update frequency yourself, ie. print only every 1 second
-# or whatever (as per "OTHER NOTES" in the PerlIO::via::EscStatus docs).
+# or whatever.  (See PerlIO::via::EscStatus "OTHER NOTES" on update
+# frequency in general).
 #
 
 use strict;
 use warnings;
 use PerlIO::via::EscStatus qw(print_status);
-use Term::Sprog;
+use Term::Sk;
 use Time::HiRes 'usleep';
 
 binmode (STDOUT, ':via(EscStatus)')
   or die "Cannot push EscStatus layer: $!";
 
-sub undo_sprog_backspaces {
+# $str is a Term::Sk get_line() string, return without its backspacing
+sub undo_sk_backspaces {
   my ($str) = @_;
   $str =~ s/([\b]+) +\1//;
   return $str;
 }
 
 my $target = 500;
-my $sprog = Term::Sprog->new ('%d %3c records, %5t elapsed, [%10b] %3p',
-                              {base   => 0,
-                               target => $target,
-                               quiet   => 1})
-  or die "Term::Sprog error ${Term::Sprog::errcode}: $Term::Sprog::errmsg";
+my $sk = Term::Sk->new ('%d %3c records, %5t elapsed, [%10b] %3p',
+                        {base   => 0,
+                         target => $target,
+                         quiet   => 1})
+  or die "Term::Sk error ${Term::Sk::errcode}: $Term::Sk::errmsg";
 
 # initial status
-print_status undo_sprog_backspaces($sprog->get_line);
+print_status undo_sk_backspaces($sk->get_line);
 
 my $step = 75;
 my $r = 0;
@@ -63,11 +71,11 @@ while ($r < $target) {
   sleep 1;
 
   $r += $step;
-  $sprog->up ($step);
+  $sk->up ($step);
 
   # new status, if there is one to show yet
-  if (my $status = $sprog->get_line) {
-    print_status undo_sprog_backspaces($status);
+  if (my $status = $sk->get_line) {
+    print_status undo_sk_backspaces($status);
   }
 }
 

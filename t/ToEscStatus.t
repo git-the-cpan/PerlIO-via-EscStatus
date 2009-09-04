@@ -25,11 +25,14 @@ use Test::More;
 if (! eval { require ProgressMonitor }) {
   plan skip_all => "ProgressMonitor package not available: $@";
 }
-plan tests => 8;
+plan tests => 9;
+
+SKIP: { eval 'use Test::NoWarnings; 1'
+          or skip 'Test::NoWarnings not available', 1; }
 
 require ProgressMonitor::Stringify::ToEscStatus;
 
-my $want_version = 5;
+my $want_version = 6;
 ok ($ProgressMonitor::Stringify::ToEscStatus::VERSION >= $want_version,
     'VERSION variable');
 ok (ProgressMonitor::Stringify::ToEscStatus->VERSION  >= $want_version,
@@ -47,7 +50,6 @@ ok (eval { ProgressMonitor::Stringify::ToEscStatus->VERSION($want_version); 1},
   ok (! eval { $te->VERSION($check_version); 1 },
       "VERSION object check $check_version");
 }
-  
 
 ok (ProgressMonitor::Stringify::ToEscStatus->new,
     'creation');

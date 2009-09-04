@@ -20,9 +20,13 @@
 use strict;
 use warnings;
 use Regexp::Common 'ANSIescape';
-use Test::More tests => 976;
+use Test::More tests => 977;
 
-my $want_version = 5;
+SKIP: { eval 'use Test::NoWarnings; 1'
+          or skip 'Test::NoWarnings not available', 1; }
+
+
+my $want_version = 6;
 ok ($Regexp::Common::ANSIescape::VERSION >= $want_version,
     'VERSION variable');
 ok (Regexp::Common::ANSIescape->VERSION  >= $want_version,
@@ -151,14 +155,14 @@ my @without_string = do { my %without;
                         };
 
 foreach my $s (@with_string) {
-  push @seven_with_string, "zz\e".chr($s)."STRING\e\\zz";
-  push @eight_with_string, "zz".chr($s+0x40)."STRING\x{9C}zz";
+  push @seven_with_string, "zz\e".chr($s)."STRI\nNG\e\\zz";
+  push @eight_with_string, "zz".chr($s+0x40)."STRI\nNG\x{9C}zz";
 
   push @seven_without_string, "zz\e".chr($s)."zz";
   push @eight_without_string, "zz".chr($s+0x40)."zz";
 
-  push @mixed_with_string, "zz\e]STRING\x{9C}zz";    # 7/8 mixed
-  push @mixed_with_string, "zz\x{9D}STRING\e\\zz";   # 8/7 mixed
+  push @mixed_with_string, "zz\e]STRI\nNG\x{9C}zz";    # 7/8 mixed
+  push @mixed_with_string, "zz\x{9D}STRI\nNG\e\\zz";   # 8/7 mixed
 }
 foreach my $s (@without_string) {
   push @seven, "zz\e".chr($s)."zz";
@@ -195,9 +199,9 @@ foreach my $elem ([$RE{ANSIescape}{-sepstring}{-only8bit}, 'sep8',
     my $printstr = Data::Dumper->new([$str],['str'])->Useqq(1)->Dump;
     $printstr =~ s/\n+$//; # no trailing newlines in test name
 
-    ok ($str =~ $re,           "$name match $printstr");
-    is ($-[0], 2,              "$name match begin $printstr");
-    is ($+[0], length($str)-2, "$name match end $printstr");
+    ok ($str =~ $re,           "$name matches $printstr");
+    is ($-[0], 2,              "$name begin pos of $printstr");
+    is ($+[0], length($str)-2, "$name end pos   of $printstr");
   }
 }
 

@@ -16,12 +16,13 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 package PerlIO::via::EscStatus::ShowAll;
+use 5.008;
 use strict;
 use warnings;
 use PerlIO::via::EscStatus;
 use PerlIO::via::EscStatus::Parser;
 
-our $VERSION = 5;
+our $VERSION = 6;
 
 use constant DEBUG => 0;
 
@@ -89,7 +90,7 @@ L<PerlIO::via::EscStatus>, L<PerlIO::via>
 
 =head1 HOME PAGE
 
-L<http://www.geocities.com/user42_kevin/perlio-via-escstatus/index.html>
+L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 

@@ -21,9 +21,13 @@ use 5.006;  # 3-arg open
 use strict;
 use warnings;
 use PerlIO::via::EscStatus::ShowNone;
-use Test::More tests => 6;
+use Test::More tests => 7;
 
-my $want_version = 5;
+SKIP: { eval 'use Test::NoWarnings; 1'
+          or skip 'Test::NoWarnings not available', 1; }
+
+
+my $want_version = 6;
 ok ($PerlIO::via::EscStatus::ShowNone::VERSION >= $want_version,
     'VERSION variable');
 ok (PerlIO::via::EscStatus::ShowNone->VERSION  >= $want_version,
@@ -46,8 +50,10 @@ sub slurp {
 
 { diag "on a binary file";
   require File::Temp;
-  my $tmp = File::Temp->new;
+  my $tmp = File::Temp->new (TEMPLATE => 'PerlIO-via-EscStatus-ShowNone-test-XXXXXX',
+                             TMPDIR => 1);
   my $filename = $tmp->filename;
+  diag "temp file $filename";
   open (my $fh, '>', $filename) or die "Cannot open $filename for write: $!";
 
   binmode ($fh, ':via(EscStatus::ShowNone)')
@@ -65,8 +71,10 @@ sub slurp {
 
 { diag "on a utf8 file";
   require File::Temp;
-  my $tmp = File::Temp->new;
+  my $tmp = File::Temp->new (TEMPLATE => 'PerlIO-via-EscStatus-ShowNone-test-XXXXXX',
+                             TMPDIR => 1);
   my $filename = $tmp->filename;
+  diag "temp file $filename";
   open (my $fh, '>', $filename) or die "Cannot open $filename for write: $!";
 
   binmode ($fh, ':utf8')

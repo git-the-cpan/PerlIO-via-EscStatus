@@ -17,12 +17,13 @@
 
 
 package ProgressMonitor::Stringify::ToEscStatus;
+use 5.008;
 use strict;
 use warnings;
 use ProgressMonitor::State qw(STATE_DONE);
 use PerlIO::via::EscStatus;
 
-our $VERSION = 5;
+our $VERSION = 6;
 
 use classes
   extends => 'ProgressMonitor::Stringify::AbstractMonitor',
@@ -111,7 +112,7 @@ ProgressMonitor::Stringify::ToEscStatus - monitor printing in EscStatus form
    ({ fields => [
         ProgressMonitor::Stringify::Fields::Spinner->new
    ]});
- 
+
  $mon->prepare;
  $mon->begin;
  $mon->tick; $mon->tick; ...
@@ -178,7 +179,7 @@ L<ProgressMonitor>, L<PerlIO::via::EscStatus>, L<Moose>
 
 =head1 HOME PAGE
 
-L<http://www.geocities.com/user42_kevin/perlio-via-escstatus/index.html>
+L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 

@@ -20,10 +20,14 @@
 use strict;
 use warnings;
 use PerlIO::via::EscStatus::Parser;
-use Test::More tests => 40;
+use Test::More tests => 41;
 use charnames ':full';
 
-my $want_version = 5;
+SKIP: { eval 'use Test::NoWarnings; 1'
+          or skip 'Test::NoWarnings not available', 1; }
+
+
+my $want_version = 6;
 ok ($PerlIO::via::EscStatus::Parser::VERSION >= $want_version,
     'VERSION variable');
 ok (PerlIO::via::EscStatus::Parser->VERSION  >= $want_version,

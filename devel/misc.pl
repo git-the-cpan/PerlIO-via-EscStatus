@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008 Kevin Ryde
+# Copyright 2008, 2009 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
-
+use 5.006;
 use strict;
 use warnings;
 use Data::Dumper;
@@ -43,7 +43,7 @@ use List::Util qw(min max);
   $out->autoflush(0);
   print $out PerlIO::via::EscStatus::make_status('hello');
   # print $out PerlIO::via::EscStatus::make_status('');
-  
+
   print "\nnow closing\n";
   close $out or die $!;
   print "buf: ", Dumper (\$buf);

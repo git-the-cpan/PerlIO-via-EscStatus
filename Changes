@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License along
 with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 6, September 2009
+    - ANSIescape match \n in character strings too
+    - example programs Term::Sprog has become Term::Sk 
+
 Version 5, March 2009
     - avoid a segv from Term::Size in the test suite
 

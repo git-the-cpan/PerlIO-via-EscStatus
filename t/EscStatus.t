@@ -20,9 +20,13 @@
 use strict;
 use warnings;
 use PerlIO::via::EscStatus;
-use Test::More tests => 476;
+use Test::More tests => 477;
 
-my $want_version = 5;
+SKIP: { eval 'use Test::NoWarnings; 1'
+          or skip 'Test::NoWarnings not available', 1; }
+
+
+my $want_version = 6;
 ok ($PerlIO::via::EscStatus::VERSION >= $want_version,
     'VERSION variable');
 ok (PerlIO::via::EscStatus->VERSION  >= $want_version,
@@ -245,6 +249,7 @@ sub WRITE {
 package main;
 use strict;
 use warnings;
+use 5.006;
 
 diag 'flush';
 

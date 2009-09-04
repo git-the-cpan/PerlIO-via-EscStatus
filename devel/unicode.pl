@@ -25,28 +25,61 @@ use Encode qw(:fallbacks);
 use PerlIO::via::EscStatus ('ESCSTATUS_STR');
 use charnames ':full';
 
-# use Term::Size;
-# { my $fh = \*STDOUT;
-#   print "tty size ", Term::Size::chars($fh), "\n";
-#   print "tty width ",PerlIO::via::EscStatus::_term_width($fh),"\n";
-# }
-# { open my $fh, '>', '/dev/null' or die;
-#   print "null size ", Term::Size::chars($fh), "\n";
-# 
-# #   my $width;
-# #   my $fd = fileno($fh);
-# #   print STDERR "_term_width on fd=", (defined $fd ? $fd : 'undef'),"\n";
-# #   if (defined $fd) {
-# #     if (open my $tmp, '>&', $fd) {
-# #       print "tmp fh $tmp\n";
-# #       $width = Term::Size::chars($tmp);
-# #       close $tmp;
-# #     }
-# #   }
-# #   print "dup ", $width,"\n";
-# 
-#   print "null width ",PerlIO::via::EscStatus::_term_width($fh),"\n";
-# }
+use PerlIO;
+sub _fh_prints_wide {
+  my ($fh) = @_;
+  require PerlIO;
+  return (PerlIO::get_layers($fh, output => 1, details => 1))[-1] # top flags
+    & PerlIO::F_UTF8();
+}
+
+{
+  local $Data::Dumper::Indent = 0;
+  $|=1;
+
+  require Term::Size;
+  open my $fh, '>', '/dev/null' or die;
+  print "/dev/null size ", Dumper([Term::Size::chars($fh)]), "\n";
+
+  my $width;
+  my $fd = fileno($fh);
+  if (defined $fd) {
+    if (open my $tmp, '<&', $fd) {
+      print "tmp fh $tmp, tmp fd ",Dumper([fileno($tmp)]), "\n";
+      $width = Term::Size::chars($tmp);
+      close $tmp;
+    }
+  }
+  print "dup width ", Dumper(\$width);
+
+  print STDERR "_term_width on fd=", (defined $fd ? $fd : 'undef'),"\n";
+  print "null width ",PerlIO::via::EscStatus::_term_width($fh),"\n";
+  exit 0;
+}
+
+{
+  binmode (STDOUT, ':utf8') or die $!;
+  print STDERR "prints wide ",_fh_prints_wide(\*STDOUT)?"yes":"no","\n";
+
+
+  print STDERR "binmode ':via(EscStatus)'\n";
+  binmode (STDOUT, ':via(EscStatus)') or die $!;
+  print STDERR "binmode done\n";
+print "\N{WHITE SMILING FACE}\n";
+
+  binmode (STDOUT, ':bytes') or die $!;
+  print STDERR "prints wide ",_fh_prints_wide(\*STDOUT)?"yes":"no","\n";
+print "\N{WHITE SMILING FACE}\n";
+
+  exit 0;
+}
+{
+  require Term::Size;
+  my $fh = \*STDOUT;
+  print "tty size ", Term::Size::chars($fh), "\n";
+  print "tty width ",PerlIO::via::EscStatus::_term_width($fh),"\n";
+  exit 0;
+}
 
 
 {

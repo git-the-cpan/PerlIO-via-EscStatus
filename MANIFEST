@@ -9,10 +9,12 @@ debian/watch
 devel/ansi.pl
 devel/encoding.pl
 devel/esc.pl
+devel/flush.pl
 devel/misc.pl
 devel/non-match.pl
 devel/partial-end.pl
 devel/property.pl
+devel/sk-whisper.pl
 devel/tostream.pl
 devel/unicode.pl
 examples/colour.pl
@@ -21,8 +23,9 @@ examples/fracs.pl
 examples/progressmonitor.pl
 examples/showall.pl
 examples/shownone.pl
-examples/term-sprog.pl
+examples/term-sk.pl
 examples/wide.pl
+inc/MyMakeMakerExtras.pm
 lib/PerlIO/via/EscStatus.pm
 lib/PerlIO/via/EscStatus/Parser.pm
 lib/PerlIO/via/EscStatus/ShowAll.pm
@@ -34,10 +37,12 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 SIGNATURE
+t/0-META-read.t
+t/0-Test-DistManifest.t
+t/0-Test-Pod.t
 t/ANSIescape.t
 t/EscStatus.t
 t/Parser.t
-t/pod.t
 t/ShowAll.t
 t/ShowNone.t
 t/ToEscStatus.t

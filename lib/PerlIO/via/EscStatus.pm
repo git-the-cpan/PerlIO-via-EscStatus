@@ -32,7 +32,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use PerlIO::via::EscStatus::Parser;
 use Regexp::Common 'ANSIescape';
 
-our $VERSION = 5;
+our $VERSION = 6;
 
 # set this to 1 or 2 for some diagnostics to STDERR
 use constant DEBUG => 0;
@@ -184,11 +184,9 @@ sub WRITE {
   my $ret_ok = length ($buf);
   if (DEBUG >= 2) {
     require Data::Dumper;
-    my $dumper = Data::Dumper->new ([$buf]);
-    $dumper->Useqq(1);
     print STDERR "WRITE len=",length($buf),
       " utf8=",utf8::is_utf8($buf)?"yes":"no",
-      " ", $dumper->Dump;
+      " ", Data::Dumper->new([$buf])->Useqq(1)->Dump;
   }
   my $want_flush = 0;
 
@@ -435,7 +433,7 @@ sub _term_width {
   if (defined $fd) {
     if (open my $tmp, '>&', $fd) {
       $width = Term::Size::chars($tmp);
-      close $tmp;
+      close $tmp or die;
     }
   }
   return ($width || 80);
@@ -599,7 +597,7 @@ L<ProgressMonitor::Stringify::ToEscStatus>
 
 =head1 HOME PAGE
 
-L<http://www.geocities.com/user42_kevin/perlio-via-escstatus/index.html>
+L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 

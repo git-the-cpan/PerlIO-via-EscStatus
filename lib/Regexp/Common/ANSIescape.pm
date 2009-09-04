@@ -16,13 +16,14 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 package Regexp::Common::ANSIescape;
+use 5.008;
 use strict;
 use warnings;
 use Carp;
 use Regexp::Common ('no_defaults', # no $RE import
                     'pattern');    # pattern func
 
-our $VERSION = 5;
+our $VERSION = 6;
 
 ## no critic (ProhibitEscapedCharacters)
 
@@ -49,6 +50,9 @@ use constant {
   #
   C1_STR_7BIT => "\e[\x{5D}\x{50}\x{58}\x{5E}\x{5F}]",
   C1_STR_8BIT =>   "[\x{9D}\x{90}\x{98}\x{9E}\x{9F}]",
+
+  # "character string" is anything except SOS or ST
+  CHAR_STR => "(.|\n)*?",
 
   # C1 forms not taking a string parameter
   # ie. C1_ALL except the five in C1_STR (and not CSI 0x5B,0x9B)
@@ -85,21 +89,35 @@ pattern (name   => ['ANSIescape'],
            if (exists $flags->{-sepstring}) {
              if (! exists $flags->{-only8bit}) { push @ret, C1_ALL_7BIT; }
              if (! exists $flags->{-only7bit}) { push @ret, C1_ALL_8BIT; }
-             
+
            } else {
              if (! exists $flags->{-only8bit}) { push @ret, C1_NST_7BIT; }
              if (! exists $flags->{-only7bit}) { push @ret, C1_NST_8BIT; }
-             
+
              if (exists $flags->{-only7bit}) {
-               push @ret, C1_STR_7BIT . '.*?' . ST_7BIT;   # 7-bit only
+               push @ret, C1_STR_7BIT . CHAR_STR . ST_7BIT;  # 7-bit only
              } elsif (exists $flags->{-only8bit}) {
-               push @ret, C1_STR_8BIT . '.*?' . ST_8BIT;   # 8-bit only
+               push @ret, C1_STR_8BIT . CHAR_STR . ST_8BIT;  # 8-bit only
              } else {
-               push @ret, C1_STR_7OR8 . '.*?' . ST_7OR8;   # 7-bit or 8-bit
+               push @ret, C1_STR_7OR8 . CHAR_STR . ST_7OR8;  # 7-bit or 8-bit
              }
            }
            return '(?k:' . join('|',@ret) . ')';
          });
+
+
+# Some stuff which might have distinguished SOS taking "character string"s
+# from others taking only "command string" chars
+#
+# C1_SOS_7BIT => "\e[\x{58}]",
+# C1_SOS_8BIT =>   "[\x{98}]",
+# C1_SOS_7OR8    => '(?:'. C1_SOS_7BIT .'|'. C1_SOS_8BIT .')',
+# # "command string" is Backspace, Tab, LF, VT, FF, CR and printables
+# CMD_STR => "[\x{08}-\x{0D}\x{20}-\x{7E}]*?",
+# push @ret, C1_SOS_7BIT   . CHAR_STR . ST_7BIT;
+# push @ret, C1_SOS_8BIT   . CHAR_STR . ST_8BIT;
+# push @ret, C1_SOS_7OR8   . CHAR_STR . ST_7OR8;
+#
 
 1;
 
@@ -194,6 +212,11 @@ is matched in its entirety.  With C<-sepstring> the pattern instead matches
 the start "\x{9F}" and the terminator "\x{9C}" individually, with the
 C<Stringarg> part unmatched.
 
+In both cases the strings can be any characters through to the first ST
+form.  The ANSI standard restricts the characters in the "command string" to
+APC, DCS, OSC and PM, as opposed to anything for "character string" to SOS.
+That restriction is not enforced by ANSIescape, currently.
+
 =item C<{-keep}>
 
 With the standard C<-keep> option parens are included to set the following
@@ -233,7 +256,7 @@ L<http://www.ecma-international.org/publications/standards/Ecma-048.htm>
 
 =head1 HOME PAGE
 
-L<http://www.geocities.com/user42_kevin/perlio-via-escstatus/index.html>
+L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 

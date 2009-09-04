@@ -44,7 +44,7 @@ print "\n";
 $str = "\x{19B}";
 utf8::upgrade($str);
 print "\n",Dumper(\$str);
-my $utf8 = Encode::encode('utf-8',$str);
+$utf8 = Encode::encode('utf-8',$str);
 for my $i (0 .. length($utf8)-1) { printf "%02X ", ord(substr($utf8,$i)); }
 print "\n";
 
