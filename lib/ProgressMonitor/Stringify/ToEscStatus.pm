@@ -1,4 +1,4 @@
-# Copyright 2008, 2009 Kevin Ryde
+# Copyright 2008, 2009, 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -23,7 +23,7 @@ use warnings;
 use ProgressMonitor::State qw(STATE_DONE);
 use PerlIO::via::EscStatus;
 
-our $VERSION = 6;
+our $VERSION = 7;
 
 use classes
   extends => 'ProgressMonitor::Stringify::AbstractMonitor',
@@ -104,7 +104,7 @@ ProgressMonitor::Stringify::ToEscStatus - monitor printing in EscStatus form
 
 =head1 SYNOPSIS
 
- use PerlIO::via::ToEscStatus;
+ use PerlIO::via::EscStatus;
  binmode (STDOUT, ':via(EscStatus)') or die;
 
  use ProgressMonitor::Stringify::ToEscStatus;
@@ -115,7 +115,7 @@ ProgressMonitor::Stringify::ToEscStatus - monitor printing in EscStatus form
 
  $mon->prepare;
  $mon->begin;
- $mon->tick; $mon->tick; ...
+ $mon->tick; $mon->tick; # etc
  $mon->end;
 
 =head1 CLASS HIERARCHY
@@ -140,7 +140,8 @@ like C<< print "\rStatus line" >>, the ToEscStatus instead does
 
 giving the output form EscStatus uses.  The contents of the status line are
 built by the configured C<ProgressMonitor> field objects in the usual way.
-See F<examples/progressmonitor.pl> in the EscStatus sources for a demo.
+See F<examples/progressmonitor.pl> in the EscStatus sources for a complete
+program.
 
 =head1 FUNCTIONS
 
@@ -183,7 +184,7 @@ L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 
-Copyright 2008, 2009 Kevin Ryde
+Copyright 2008, 2009, 2010 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

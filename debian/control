@@ -16,9 +16,9 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Build-Depends could have the "maximum_tests" modules from
-# Makefile.PL for more tests, but they're optional author tests really
-# and would just make the build tools drag in more stuff.
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
 
 Source: libperlio-via-escstatus-perl
 Section: perl

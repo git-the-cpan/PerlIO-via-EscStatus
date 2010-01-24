@@ -1,48 +1,60 @@
 --- #YAML:1.0
-name:                PerlIO-via-EscStatus
-version:             6
-abstract:            Printing a status line through an I/O layer.
-license:             gpl
-author:              
+name:               PerlIO-via-EscStatus
+version:            7
+abstract:           Printing a status line through an I/O layer.
+author:
     - Kevin Ryde <user42@zip.com.au>
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Encode:                        0
-    PerlIO::via:                   0
-    Regexp::Common:                0
-    Term::Size:                    0
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
-recommends:
-    Test::Pod: 1.00
-    ProgressMonitor: 0
-optional_features:
-    maximum_tests:
-        description: Have "make test" do as much as possible.
-        requires:
-            Parse::CPAN::Meta: 0
-            Test::Pod: 1.00
-            Test::NoWarnings: 0
-            Test::DistManifest: 0
-            Test::YAML::Meta: 0
-            YAML: 0
-            YAML::Syck: 0
-            YAML::Tiny: 0
-            YAML::XS: 0
-    maximum_examples:
-        description: Be able to run all the example programs.
-        requires:
-            ProgressMonitor: 0
-            Term::ANSIColor: 0
-            Term::Sk: 0
-            Time::HiRes: 0
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Encode:          0
+    perl:            5.008005
+    PerlIO::via:     0
+    Regexp::Common:  0
+    Term::Size:      0
+resources:
+    homepage:  http://user42.tuxfamily.org/perlio-via-escstatus/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
 no_index:
     directory:
-        - devel
-        - inc
         - t
-resources:
-    homepage: http://user42.tuxfamily.org/perlio-via-escstatus/index.html
-    license: http://www.gnu.org/licenses/gpl.html
+        - inc
+        - devel
+        - examples
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+optional_features:
+    maximum_devel:
+        description:  Stuff used variously for development.
+        requires:
+            charnames:         0
+            Devel::FindRef:    0
+            Devel::TraceLoad:  0
+            Term::Sk:          0
+    maximum_examples:
+        description:  Be able to run all the example programs.
+        requires:
+            ProgressMonitor:  0
+            Term::Sk:         0
+    maximum_interoperation:
+        description:  Have maximum inter-operation with other modules (optional supported other stuff).
+        requires:
+            ProgressMonitor:  0
+    maximum_tests:
+        description:  Have "make test" do as much as possible.
+        requires:
+            Parse::CPAN::Meta:   0
+            Test::DistManifest:  0
+            Test::NoWarnings:    0
+            Test::Pod:           1.00
+            Test::YAML::Meta:    0.13
+            YAML:                0
+            YAML::Syck:          0
+            YAML::Tiny:          0
+            YAML::XS:            0

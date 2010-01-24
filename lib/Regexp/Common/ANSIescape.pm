@@ -1,4 +1,4 @@
-# Copyright 2008, 2009 Kevin Ryde
+# Copyright 2008, 2009, 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -16,102 +16,101 @@
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 package Regexp::Common::ANSIescape;
-use 5.008;
+use 5.005;
 use strict;
 use warnings;
 use Carp;
-use Regexp::Common ('no_defaults', # no $RE import
-                    'pattern');    # pattern func
+# no import(), don't want %RE or builtins, and can call pattern() by full name
+use Regexp::Common ();
+use vars ('$VERSION');
 
-our $VERSION = 6;
+$VERSION = 7;
 
 ## no critic (ProhibitEscapedCharacters)
 
-use constant {
-  CSI_7BIT => "\e\\\x{5B}",  # ie. Esc and a literal [ char
-  CSI_8BIT => "\x{9B}",
+use constant CSI_7BIT => "\e\\\x{5B}";  # ie. Esc and a literal [ char
+use constant CSI_8BIT => "\x{9B}";
 
-  # C1 Esc @ through Esc _
-  # excluding CSI which is Esc 0x5B, and 0x9B
-  # Note \x{5C} is "\" so doubled to escape.
-  #
-  C1_ALL_7BIT => "\e[\x{40}-\x{5A}\\\x{5C}-\x{5F}]",
-  C1_ALL_8BIT =>   "[\x{80}-\x{9A}\x{9C}-\x{9F}]",
+# C1 Esc @ through Esc _
+# excluding CSI which is Esc 0x5B, and 0x9B
+# Note \x{5C} is "\" so doubled to escape.
+#
+use constant C1_ALL_7BIT => "\e[\x{40}-\x{5A}\\\x{5C}-\x{5F}]";
+use constant C1_ALL_8BIT =>   "[\x{80}-\x{9A}\x{9C}-\x{9F}]";
 
-  # C1 forms taking a string parameter
-  #
-  #   DCS   Esc P  (0x50 / 0x90)
-  #   SOS   Esc X  (0x58 / 0x98)
-  #   OSC   Esc ]  (0x5D / 0x9D)
-  #   PM    Esc ^  (0x5E / 0x9E)
-  #   APC   Esc _  (0x5F / 0x9F)
-  #
-  # Note \x{5D} "]" first in the char class, and \x{5E} "^" not first.
-  #
-  C1_STR_7BIT => "\e[\x{5D}\x{50}\x{58}\x{5E}\x{5F}]",
-  C1_STR_8BIT =>   "[\x{9D}\x{90}\x{98}\x{9E}\x{9F}]",
+# C1 forms taking a string parameter
+#
+#   DCS   Esc P  (0x50 / 0x90)
+#   SOS   Esc X  (0x58 / 0x98)
+#   OSC   Esc ]  (0x5D / 0x9D)
+#   PM    Esc ^  (0x5E / 0x9E)
+#   APC   Esc _  (0x5F / 0x9F)
+#
+# Note \x{5D} "]" first in the char class, and \x{5E} "^" not first.
+#
+use constant C1_STR_7BIT => "\e[\x{5D}\x{50}\x{58}\x{5E}\x{5F}]";
+use constant C1_STR_8BIT =>   "[\x{9D}\x{90}\x{98}\x{9E}\x{9F}]";
 
-  # "character string" is anything except SOS or ST
-  CHAR_STR => "(.|\n)*?",
+# "character string" is anything except SOS or ST
+use constant CHAR_STR => "(.|\n)*?";
 
-  # C1 forms not taking a string parameter
-  # ie. C1_ALL except the five in C1_STR (and not CSI 0x5B,0x9B)
-  # Note \x{5C} "\" doubled to escape.
-  #
-  C1_NST_7BIT => "\e[\x{40}-\x{4F}\x{51}-\x{57}\x{59}\x{5A}\\\x{5C}]",
-  C1_NST_8BIT =>   "[\x{80}-\x{8F}\x{91}-\x{97}\x{99}\x{9A}\x{9C}]",
+# C1 forms not taking a string parameter
+# this is C1_ALL except the five in C1_STR (and not CSI 0x5B,0x9B)
+# Note \x{5C} "\" doubled to escape.
+#
+use constant C1_NST_7BIT => "\e[\x{40}-\x{4F}\x{51}-\x{57}\x{59}\x{5A}\\\x{5C}]";
+use constant C1_NST_8BIT =>   "[\x{80}-\x{8F}\x{91}-\x{97}\x{99}\x{9A}\x{9C}]";
 
-  # ST string terminator
-  ST_7BIT => "\e\\\\",  # ie. Esc and a backslash
-  ST_8BIT => "\x{9C}",
-};
+# ST string terminator
+use constant ST_7BIT => "\e\\\\";  # ie. Esc and a backslash
+use constant ST_8BIT => "\x{9C}";
 
-use constant {
-  CSI_7OR8    => '(?:'. CSI_7BIT    .'|'. CSI_8BIT    .')',
-  C1_STR_7OR8 => '(?:'. C1_STR_7BIT .'|'. C1_STR_8BIT .')',
-  ST_7OR8     => '(?:'. ST_7BIT     .'|'. ST_8BIT     .')',
-};
+use constant CSI_7OR8    => '(?:'. CSI_7BIT    .'|'. CSI_8BIT    .')';
+use constant C1_STR_7OR8 => '(?:'. C1_STR_7BIT .'|'. C1_STR_8BIT .')';
+use constant ST_7OR8     => '(?:'. ST_7BIT     .'|'. ST_8BIT     .')';
 
-pattern (name   => ['ANSIescape'],
-         create => sub {
-           my ($self, $flags) = @_;
 
-           if (exists $flags->{-only7bit} && exists $flags->{-only8bit}) {
-             croak 'ANSIescape: cannot have only7bit and only8bit at the same time';
-           }
+Regexp::Common::pattern
+  (name   => ['ANSIescape'],
+   create => sub {
+     my ($self, $flags) = @_;
 
-           my @ret;
-           push @ret, (exists $flags->{-only7bit}   ? CSI_7BIT  # 7-bit only
-                       : exists $flags->{-only8bit} ? CSI_8BIT  # 8-bit only
-                       :                              CSI_7OR8) # 7bit or 8bit
-           . "(?k:[\x{30}-\x{3F}]*)(?k:[\x{20}-\x{2F}]*[\x{40}-\x{7E}])";
+     if (exists $flags->{-only7bit} && exists $flags->{-only8bit}) {
+       croak 'ANSIescape: cannot have only7bit and only8bit at the same time';
+     }
 
-           if (exists $flags->{-sepstring}) {
-             if (! exists $flags->{-only8bit}) { push @ret, C1_ALL_7BIT; }
-             if (! exists $flags->{-only7bit}) { push @ret, C1_ALL_8BIT; }
+     my @ret;
+     push @ret, (exists $flags->{-only7bit}   ? CSI_7BIT  # 7-bit only
+                 : exists $flags->{-only8bit} ? CSI_8BIT  # 8-bit only
+                 :                              CSI_7OR8) # 7bit or 8bit
+       . "(?k:[\x{30}-\x{3F}]*)(?k:[\x{20}-\x{2F}]*[\x{40}-\x{7E}])";
 
-           } else {
-             if (! exists $flags->{-only8bit}) { push @ret, C1_NST_7BIT; }
-             if (! exists $flags->{-only7bit}) { push @ret, C1_NST_8BIT; }
+     if (exists $flags->{-sepstring}) {
+       if (! exists $flags->{-only8bit}) { push @ret, C1_ALL_7BIT; }
+       if (! exists $flags->{-only7bit}) { push @ret, C1_ALL_8BIT; }
 
-             if (exists $flags->{-only7bit}) {
-               push @ret, C1_STR_7BIT . CHAR_STR . ST_7BIT;  # 7-bit only
-             } elsif (exists $flags->{-only8bit}) {
-               push @ret, C1_STR_8BIT . CHAR_STR . ST_8BIT;  # 8-bit only
-             } else {
-               push @ret, C1_STR_7OR8 . CHAR_STR . ST_7OR8;  # 7-bit or 8-bit
-             }
-           }
-           return '(?k:' . join('|',@ret) . ')';
-         });
+     } else {
+       if (! exists $flags->{-only8bit}) { push @ret, C1_NST_7BIT; }
+       if (! exists $flags->{-only7bit}) { push @ret, C1_NST_8BIT; }
+
+       if (exists $flags->{-only7bit}) {
+         push @ret, C1_STR_7BIT . CHAR_STR . ST_7BIT;  # 7-bit only
+       } elsif (exists $flags->{-only8bit}) {
+         push @ret, C1_STR_8BIT . CHAR_STR . ST_8BIT;  # 8-bit only
+       } else {
+         push @ret, C1_STR_7OR8 . CHAR_STR . ST_7OR8;  # 7-bit or 8-bit
+       }
+     }
+     return '(?k:' . join('|',@ret) . ')';
+   });
 
 
 # Some stuff which might have distinguished SOS taking "character string"s
 # from others taking only "command string" chars
 #
-# C1_SOS_7BIT => "\e[\x{58}]",
-# C1_SOS_8BIT =>   "[\x{98}]",
-# C1_SOS_7OR8    => '(?:'. C1_SOS_7BIT .'|'. C1_SOS_8BIT .')',
+# C1_SOS_7BIT => "\e[\x{58}]";
+# C1_SOS_8BIT =>   "[\x{98}]";
+# C1_SOS_7OR8    => '(?:'. C1_SOS_7BIT .'|'. C1_SOS_8BIT .')';
 # # "command string" is Backspace, Tab, LF, VT, FF, CR and printables
 # CMD_STR => "[\x{08}-\x{0D}\x{20}-\x{7E}]*?",
 # push @ret, C1_SOS_7BIT   . CHAR_STR . ST_7BIT;
@@ -127,12 +126,14 @@ __END__
 
 Regexp::Common::ANSIescape -- regexps for ANSI terminal escapes
 
+=for test_synopsis my ($str)
+
 =head1 SYNOPSIS
 
- use Regexp::Common 'ANSIescape';
+ use Regexp::Common 'ANSIescape', 'no_defaults';
 
  if ($str =~ /$RE{ANSIescape}/) {
-    ...
+    # ...
  }
 
  my $re1 = $RE{ANSIescape}{-only7bit};
@@ -140,7 +141,8 @@ Regexp::Common::ANSIescape -- regexps for ANSI terminal escapes
 
 =head1 DESCRIPTION
 
-An ANSIescape pattern matches an ANSI terminal escape sequence like
+See L<Regexp::Common> for the basics of C<Regexp::Common> patterns.  An
+ANSIescape pattern matches an ANSI terminal escape sequence like
 
     Esc[30;48m             # CSI sequence
     Esc[?1h                # CSI with private params
@@ -150,14 +152,14 @@ An ANSIescape pattern matches an ANSI terminal escape sequence like
     \x9B 30m               # ditto in 8-bit forms
     \x9B ?1h
     \x85
-    \x9F APPSTRING \x9C         
+    \x9F APPSTRING \x9C
 
-The 7-bit patterns are simply Esc followed by various combinations of
-printable ASCII C<"\x20"> through C<"\x7E">.
+The 7-bit patterns are Esc followed by various combinations of printable
+ASCII C<"\x20"> through C<"\x7E">.
 
 The 8-bit forms use bytes C<"\x80"> through C<"\x9F">.  The C<-only7bit>
 option below can omit the 8-bit patterns if they might have another
-meaning.
+meaning:
 
 =over 4
 
@@ -169,7 +171,7 @@ so they're free to be the ANSI escapes.
 =item *
 
 Unicode code points C<\x80> through C<\x9F> have the ANSI meaning, so Perl
-wide-char strings are fine (except on an EBCDIC system).
+wide-char strings on ASCII systems are fine (but not EBCDIC).
 
 =item *
 
@@ -179,9 +181,9 @@ C<-only7bit>.
 
 =item *
 
-Other encodings may use C<\x80> through C<\x9F> as normal characters, for
-example DOS code page 1252.  Generally C<-only7bit> should be used in that
-case.
+Other encodings may use C<\x80> through C<\x9F> as characters, eg. the DOS
+code page 1252 extension of Latin-1.  Generally C<-only7bit> should be used
+in that case.
 
 =back
 
@@ -247,20 +249,35 @@ example
 
 =back
 
+=head1 IMPORTS
+
+ANSIescape should be loaded through the C<Regexp::Common> mechanism, see
+L<Regexp::Common/Loading specific sets of patterns.>.  Remember that loading
+a non-core pattern like ANSIescape also gets all the builtin patterns.
+
+    # ANSIescape plus all builtins
+    use Regexp::Common 'ANSIescape';
+
+If you want C<$RE{ANSIescape}> then add C<no_defaults> (or a specific set of
+builtins desired).
+
+    # ANSIescape alone
+    use Regexp::Common 'ANSIescape', 'no_defaults';
+
 =head1 SEE ALSO
 
 L<Regexp::Common>
 
 The ANSI standard can be obtained as ECMA-48 at
-L<http://www.ecma-international.org/publications/standards/Ecma-048.htm>
+http://www.ecma-international.org/publications/standards/Ecma-048.htm
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
+http://user42.tuxfamily.org/perlio-via-escstatus/index.html
 
 =head1 LICENSE
 
-Copyright 2008, 2009 Kevin Ryde
+Copyright 2008, 2009, 2010 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the
@@ -273,6 +290,6 @@ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 more details.
 
 You should have received a copy of the GNU General Public License along with
-PerlIO-via-EscStatus.  If not, see L<http://www.gnu.org/licenses/>.
+PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut

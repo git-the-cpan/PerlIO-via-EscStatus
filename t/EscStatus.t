@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008, 2009 Kevin Ryde
+# Copyright 2008, 2009, 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
+use 5.006;
 use strict;
 use warnings;
 use PerlIO::via::EscStatus;
@@ -26,10 +27,10 @@ SKIP: { eval 'use Test::NoWarnings; 1'
           or skip 'Test::NoWarnings not available', 1; }
 
 
-my $want_version = 6;
-ok ($PerlIO::via::EscStatus::VERSION >= $want_version,
+my $want_version = 7;
+is ($PerlIO::via::EscStatus::VERSION, $want_version,
     'VERSION variable');
-ok (PerlIO::via::EscStatus->VERSION  >= $want_version,
+is (PerlIO::via::EscStatus->VERSION,  $want_version,
     'VERSION class method');
 ok (eval { PerlIO::via::EscStatus->VERSION($want_version); 1 },
     "VERSION class check $want_version");
@@ -220,43 +221,41 @@ diag '_truncate';
 #------------------------------------------------------------------------------
 # FLUSH propagation
 
-package PerlIO::via::MyLowlevel;
-use strict;
-use warnings;
+{
+  package PerlIO::via::MyLowlevel;
 
-sub PUSHED {
-  my ($class, $mode, $fh) = @_;
-  return bless {}, $class;
+  sub PUSHED {
+    my ($class, $mode, $fh) = @_;
+    return bless {}, $class;
+  }
+
+  my $saw_flush = 0;
+  sub saw_flush { return $saw_flush; }
+  sub reset_saw { $saw_flush = 0; }
+
+  sub FLUSH {
+    my ($self, $fh) = @_;
+    # print STDERR "MyLowlevel: FLUSH\n";
+    $saw_flush = 1;
+    return 0; # success
+  }
+
+  sub WRITE {
+    my ($self, $buf, $fh) = @_;
+    # print STDERR "MyLowlevel: WRITE ",length($buf),"\n";
+    return length ($buf);
+  }
 }
-
-my $saw_flush = 0;
-sub saw_flush { return $saw_flush; }
-sub reset_saw { $saw_flush = 0; }
-
-sub FLUSH {
-  my ($self, $fh) = @_;
-  # print STDERR "MyLowlevel: FLUSH\n";
-  $saw_flush = 1;
-  return 0; # success
-}
-
-sub WRITE {
-  my ($self, $buf, $fh) = @_;
-  # print STDERR "MyLowlevel: WRITE ",length($buf),"\n";
-  return length ($buf);
-}
-
-package main;
-use strict;
-use warnings;
-use 5.006;
 
 diag 'flush';
+
+require File::Spec;
+my $devnull = File::Spec->devnull;
 
 # the first two here just to make sure the test framework is doing what it
 # should
 {
-  open (my $out, '> :via(MyLowlevel)', '/dev/null') or die;
+  open (my $out, '> :via(MyLowlevel)', $devnull) or die;
 
   require IO::Handle;
   PerlIO::via::MyLowlevel::reset_saw();
@@ -267,8 +266,8 @@ diag 'flush';
   close $out or die;
 }
 {
-  print "with encoding\n";
-  open (my $out, '> :via(MyLowlevel) :encoding(latin-1)', '/dev/null') or die;
+  diag "with encoding";
+  open (my $out, '> :via(MyLowlevel) :encoding(latin-1)', $devnull) or die;
 
   print $out "x";
   PerlIO::via::MyLowlevel::reset_saw();
@@ -280,8 +279,8 @@ diag 'flush';
   close $out or die;
 }
 {
-  print "with ttystatus\n";
-  open (my $out, '> :via(MyLowlevel) :via(EscStatus)', '/dev/null') or die;
+  diag "with ttystatus";
+  open (my $out, '> :via(MyLowlevel) :via(EscStatus)', $devnull) or die;
 
   print $out "x";
   PerlIO::via::MyLowlevel::reset_saw();
@@ -320,7 +319,7 @@ foreach my $fh (\*STDOUT, \*STDERR) {
 # only testing that close succeeds (the sublayers are already closed)
 diag('close clearing');
 {
-  open my $out, '>', '/dev/null' or die;
+  open my $out, '>', $devnull or die;
   binmode ($out, ':via(EscStatus)') or die;
   print $out PerlIO::via::EscStatus::make_status('hello');
   ok (close $out,

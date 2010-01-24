@@ -1,4 +1,4 @@
-Copyright 2008, 2009 Kevin Ryde
+Copyright 2008, 2009, 2010 Kevin Ryde
 
 This file is part of PerlIO-via-EscStatus.
 
@@ -15,6 +15,10 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 7, January 2010
+    - don't load builtin patterns of Regexp::Common, just ANSIescape
+      (avoids dodginess in Beatnik pattern of Regexp::Common 2.120)
 
 Version 6, September 2009
     - ANSIescape match \n in character strings too

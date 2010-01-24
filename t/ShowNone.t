@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008, 2009 Kevin Ryde
+# Copyright 2008, 2009, 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -27,10 +27,10 @@ SKIP: { eval 'use Test::NoWarnings; 1'
           or skip 'Test::NoWarnings not available', 1; }
 
 
-my $want_version = 6;
-ok ($PerlIO::via::EscStatus::ShowNone::VERSION >= $want_version,
+my $want_version = 7;
+is ($PerlIO::via::EscStatus::ShowNone::VERSION, $want_version,
     'VERSION variable');
-ok (PerlIO::via::EscStatus::ShowNone->VERSION  >= $want_version,
+is (PerlIO::via::EscStatus::ShowNone->VERSION,  $want_version,
     'VERSION class method');
 ok (eval { PerlIO::via::EscStatus::ShowNone->VERSION($want_version); 1 },
     "VERSION class check $want_version");

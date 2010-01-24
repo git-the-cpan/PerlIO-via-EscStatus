@@ -1,4 +1,4 @@
-# Copyright 2008, 2009 Kevin Ryde
+# Copyright 2008, 2009, 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -30,9 +30,9 @@ our @EXPORT_OK = qw(ESCSTATUS_STR print_status make_status);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 use PerlIO::via::EscStatus::Parser;
-use Regexp::Common 'ANSIescape';
+use Regexp::Common 'ANSIescape', 'no_defaults';
 
-our $VERSION = 6;
+our $VERSION = 7;
 
 # set this to 1 or 2 for some diagnostics to STDERR
 use constant DEBUG => 0;
@@ -601,7 +601,7 @@ L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 
-Copyright 2008, 2009 Kevin Ryde
+Copyright 2008, 2009, 2010 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

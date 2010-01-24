@@ -1,6 +1,6 @@
-#!/usr/bin/make -f
+#!/usr/bin/perl
 
-# Copyright 2008, 2010 Kevin Ryde
+# Copyright 2009, 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -17,8 +17,25 @@
 # You should have received a copy of the GNU General Public License along
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/perlmodule.mk
-include /usr/share/cdbs/1/rules/simple-patchsys.mk
 
-DEB_INSTALL_EXAMPLES_libperlio-via-escstatus-perl = examples/*
+## no critic (ProhibitCallsToUndeclaredSubs)
+
+use strict;
+use warnings;
+use Test::More;
+
+eval 'use Test::Synopsis; 1'
+  or plan skip_all => "due to Test::Synopsis not available -- $@";
+
+plan tests => 5;
+
+# exclude lib/ProgressMonitor/Stringify/ToEscStatus.pm as its synopsis code
+# depends on ProgressMonitor
+#
+synopsis_ok('lib/PerlIO/via/EscStatus.pm');
+synopsis_ok('lib/PerlIO/via/EscStatus/ShowAll.pm');
+synopsis_ok('lib/PerlIO/via/EscStatus/ShowNone.pm');
+synopsis_ok('lib/PerlIO/via/EscStatus/Parser.pm');
+synopsis_ok('lib/Regexp/Common/ANSIescape.pm');
+
+exit 0;

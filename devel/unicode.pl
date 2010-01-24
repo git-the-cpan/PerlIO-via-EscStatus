@@ -37,9 +37,12 @@ sub _fh_prints_wide {
   local $Data::Dumper::Indent = 0;
   $|=1;
 
+  require File::Spec;
+  my $devnull = File::Spec->devnull;
+
   require Term::Size;
-  open my $fh, '>', '/dev/null' or die;
-  print "/dev/null size ", Dumper([Term::Size::chars($fh)]), "\n";
+  open my $fh, '>', $devnull or die;
+  print "$devnull size ", Dumper([Term::Size::chars($fh)]), "\n";
 
   my $width;
   my $fd = fileno($fh);

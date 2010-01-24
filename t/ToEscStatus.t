@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008, 2009 Kevin Ryde
+# Copyright 2008, 2009, 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -32,10 +32,10 @@ SKIP: { eval 'use Test::NoWarnings; 1'
 
 require ProgressMonitor::Stringify::ToEscStatus;
 
-my $want_version = 6;
-ok ($ProgressMonitor::Stringify::ToEscStatus::VERSION >= $want_version,
+my $want_version = 7;
+is ($ProgressMonitor::Stringify::ToEscStatus::VERSION, $want_version,
     'VERSION variable');
-ok (ProgressMonitor::Stringify::ToEscStatus->VERSION  >= $want_version,
+is (ProgressMonitor::Stringify::ToEscStatus->VERSION,  $want_version,
     'VERSION class method');
 ok (eval { ProgressMonitor::Stringify::ToEscStatus->VERSION($want_version); 1},
     "VERSION class check $want_version");
@@ -44,7 +44,7 @@ ok (eval { ProgressMonitor::Stringify::ToEscStatus->VERSION($want_version); 1},
      "VERSION class check $check_version");
 }
 { my $te = ProgressMonitor::Stringify::ToEscStatus->new;
-  ok ($te->VERSION  >= $want_version, 'VERSION object method');
+  is ($te->VERSION, $want_version, 'VERSION object method');
   $te->VERSION ($want_version);
   my $check_version = $want_version + 1000;
   ok (! eval { $te->VERSION($check_version); 1 },
