@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 # Copyright 2008, 2009, 2010 Kevin Ryde
 
@@ -20,14 +20,15 @@
 use 5.006;  # 3-arg open
 use strict;
 use warnings;
+use Test::More tests => 6;
+
+use lib 't';
+use MyTestHelpers;
+BEGIN { MyTestHelpers::nowarnings() }
+
 use PerlIO::via::EscStatus::ShowNone;
-use Test::More tests => 7;
 
-SKIP: { eval 'use Test::NoWarnings; 1'
-          or skip 'Test::NoWarnings not available', 1; }
-
-
-my $want_version = 7;
+my $want_version = 8;
 is ($PerlIO::via::EscStatus::ShowNone::VERSION, $want_version,
     'VERSION variable');
 is (PerlIO::via::EscStatus::ShowNone->VERSION,  $want_version,

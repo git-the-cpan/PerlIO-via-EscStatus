@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 # Copyright 2008, 2009, 2010 Kevin Ryde
 
@@ -21,13 +21,13 @@ use 5.006;
 use strict;
 use warnings;
 use PerlIO::via::EscStatus;
-use Test::More tests => 477;
+use Test::More tests => 860;
 
-SKIP: { eval 'use Test::NoWarnings; 1'
-          or skip 'Test::NoWarnings not available', 1; }
+use lib 't';
+use MyTestHelpers;
+MyTestHelpers::nowarnings();
 
-
-my $want_version = 7;
+my $want_version = 8;
 is ($PerlIO::via::EscStatus::VERSION, $want_version,
     'VERSION variable');
 is (PerlIO::via::EscStatus->VERSION,  $want_version,
@@ -41,6 +41,13 @@ ok (eval { PerlIO::via::EscStatus->VERSION($want_version); 1 },
 
 ## no critic (ProtectPrivateSubs)
 
+
+sub printable {
+  my ($str) = @_;
+  $str =~ s{([^[:ascii:]])}
+           {sprintf('\\x{%02X}',ord($1))}ge;
+  return $str;
+}
 
 #------------------------------------------------------------------------------
 # _IsZero
@@ -113,52 +120,36 @@ ok ("\x{FEFF}" !~ /\p{PerlIO::via::EscStatus::_IsOther}/); # BOM
 
 diag '_truncate';
 
-# singles
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ("", 0);
-  is ($trunc, "");
-  is ($cols, 0);
-}
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ("xyz", 0);
-  is ($trunc, "");
-  is ($cols, 0);
-}
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ("xyz", 1);
-  is ($trunc, "x");
-  is ($cols, 1);
-}
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ("xyz", 2);
-  is ($trunc, "xy");
-  is ($cols, 2);
-}
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ("xyz", 3);
-  is ($trunc, "xyz");
-  is ($cols, 3);
-}
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ("xyz", 4);
-  is ($trunc, "xyz");
-  is ($cols, 3);
-}
+foreach my $elem (
+                  # singles
+                  ["", 0, "", 0 ],
+                  ["xyz", 0, "", 0 ],
 
-# doubles
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate
-    ("\x{1101}\x{1102}\x{1103}\x{1104}", 5);
-  is ($trunc, "\x{1101}\x{1102}");
-  is ($cols, 4);
-}
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate
-    ("\x{1101}\x{1102}\x{1103}\x{1104}\r", 8);
-  is ($trunc, "\x{1101}\x{1102}\x{1103}\x{1104}\r");
-  is ($cols, 8);
-}
+                  ["x", 1, "x", 1 ],
+                  ["xy", 2, "xy", 2 ],
+                  ["xyz", 3, "xyz", 3 ],
+                  ["xyz", 4, "xyz", 3 ],
 
-# tabs
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ("\tAB\a", 9);
-  is ($trunc, "\tA");
-  is ($cols, 9);
-}
-{ my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ("ZZ\tAB\a", 9);
-  is ($trunc, "ZZ\tA");
-  is ($cols, 9);
+                  # doubles
+                  ["\x{1101}\x{1102}\x{1103}\x{1104}", 5,
+                   "\x{1101}\x{1102}", 4 ],
+
+                  ["\x{1101}\x{1102}\x{1103}\x{1104}\r", 8,
+                   "\x{1101}\x{1102}\x{1103}\x{1104}\r", 8 ],
+
+                  # tabs
+                  [ "\tAB\a", 9, "\tA", 9 ],
+                  [ "ZZ\tAB\a", 9, "ZZ\tA", 9 ],
+
+                 ) {
+  my ($str, $cols_limit, $want_trunc, $want_cols) = @$elem;
+
+  my ($got_trunc, $got_cols) = PerlIO::via::EscStatus::_truncate
+    ($str, $cols_limit);
+
+  my $name = "on limit $cols_limit str ".printable($str);
+  is ($got_trunc, $want_trunc, "string $name");
+  is ($got_cols,  $want_cols,  "cols $name");
 }
 
 # ANSI
@@ -208,15 +199,23 @@ diag '_truncate';
   is ($trunc, substr($str,0,39));
   is ($cols, 78);
 }
-{
-  foreach my $i (0x20 .. 0x7F, 0xA0 .. 0xFF) {
-    my $str = chr($i); # byte, without utf8 flag
+
+require Unicode::Normalize;
+foreach my $i (0x20 .. 0x7F, 0xA0 .. 0xFF) {
+  my $str = chr($i); # byte, without utf8 flag
+  {
     my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ($str, 1);
     is ($trunc, $str, "char $i passes");
     is ($cols, 1, "char $i col width 1");
   }
+  $str = Unicode::Normalize::normalize('D',$str);
+  {
+    my $len = length($str);
+    my ($trunc, $cols) = PerlIO::via::EscStatus::_truncate ($str, 1);
+    is ($trunc, $str, "D normalized char $i passes (len $len)");
+    is ($cols, 1, "D normalized char $i col width 1");
+  }
 }
-
 
 #------------------------------------------------------------------------------
 # FLUSH propagation
@@ -229,23 +228,23 @@ diag '_truncate';
     return bless {}, $class;
   }
 
-  my $saw_flush = 0;
-  sub saw_flush { return $saw_flush; }
-  sub reset_saw { $saw_flush = 0; }
+    my $saw_flush = 0;
+    sub saw_flush { return $saw_flush; }
+    sub reset_saw { $saw_flush = 0; }
 
-  sub FLUSH {
-    my ($self, $fh) = @_;
-    # print STDERR "MyLowlevel: FLUSH\n";
-    $saw_flush = 1;
-    return 0; # success
-  }
+    sub FLUSH {
+      my ($self, $fh) = @_;
+      # print STDERR "MyLowlevel: FLUSH\n";
+      $saw_flush = 1;
+      return 0; # success
+    }
 
-  sub WRITE {
-    my ($self, $buf, $fh) = @_;
-    # print STDERR "MyLowlevel: WRITE ",length($buf),"\n";
-    return length ($buf);
+    sub WRITE {
+      my ($self, $buf, $fh) = @_;
+      # print STDERR "MyLowlevel: WRITE ",length($buf),"\n";
+      return length ($buf);
+    }
   }
-}
 
 diag 'flush';
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 # Copyright 2008, 2009, 2010 Kevin Ryde
 
@@ -20,13 +20,14 @@
 use strict;
 use warnings;
 use Regexp::Common 'ANSIescape', 'no_defaults';
-use Test::More tests => 977;
+use Test::More tests => 976;
 
-SKIP: { eval 'use Test::NoWarnings; 1'
-          or skip 'Test::NoWarnings not available', 1; }
+use lib 't';
+use MyTestHelpers;
+BEGIN { MyTestHelpers::nowarnings() }
 
 
-my $want_version = 7;
+my $want_version = 8;
 is ($Regexp::Common::ANSIescape::VERSION, $want_version,
     'VERSION variable');
 is (Regexp::Common::ANSIescape->VERSION,  $want_version,

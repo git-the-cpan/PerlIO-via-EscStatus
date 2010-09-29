@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -17,34 +17,6 @@
 # You should have received a copy of the GNU General Public License along
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
-use PerlIO::via::EscStatus;
-
-binmode (STDOUT, ':via(EscStatus)')
-  or die $!;
-
-
-my $foo = Foo->new;
-$foo->{'circular'} = $foo;
-print fileno(STDOUT),"\n";
-
-# after scope destructions, before global destruction
-use File::Coda;
-
-END {
-  print STDERR "my end\n";
-  print STDERR "  stdout ",fileno(STDOUT),"\n";
-}
-
-exit 0;
-
-package Foo;
-sub new {
-  my $class = shift;
-  return bless {@_}, $class;
-}
-sub DESTROY {
-  print STDERR "destroy Foo\n";
-}
-
+print tell(\*STDOUT),"\n";
+print tell(\*STDOUT),"\n";
+print tell(\*STDOUT),"\n";

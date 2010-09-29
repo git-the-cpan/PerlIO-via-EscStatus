@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License along
 with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 8, September 2010
+    - test manifest only as an author test
+
 Version 7, January 2010
     - don't load builtin patterns of Regexp::Common, just ANSIescape
       (avoids dodginess in Beatnik pattern of Regexp::Common 2.120)

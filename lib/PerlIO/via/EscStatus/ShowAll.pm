@@ -22,7 +22,7 @@ use warnings;
 use PerlIO::via::EscStatus;
 use PerlIO::via::EscStatus::Parser;
 
-our $VERSION = 7;
+our $VERSION = 8;
 
 use constant DEBUG => 0;
 

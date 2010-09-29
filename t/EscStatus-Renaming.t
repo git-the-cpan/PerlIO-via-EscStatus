@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -17,25 +17,28 @@
 # You should have received a copy of the GNU General Public License along
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
-
-## no critic (ProhibitCallsToUndeclaredSubs)
-
+use 5.006;
 use strict;
 use warnings;
 use Test::More;
 
-eval 'use Test::Synopsis; 1'
-  or plan skip_all => "due to Test::Synopsis not available -- $@";
+use lib 't';
+use MyTestHelpers;
+BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 5;
+BEGIN {
+  eval 'use Exporter::Renaming; 1'
+    or plan skip_all => "due to Exporter::Renaming not available -- $@";
+  plan tests => 4;
+}
 
-# exclude lib/ProgressMonitor/Stringify/ToEscStatus.pm as its synopsis code
-# depends on ProgressMonitor
-#
-synopsis_ok('lib/PerlIO/via/EscStatus.pm');
-synopsis_ok('lib/PerlIO/via/EscStatus/ShowAll.pm');
-synopsis_ok('lib/PerlIO/via/EscStatus/ShowNone.pm');
-synopsis_ok('lib/PerlIO/via/EscStatus/Parser.pm');
-synopsis_ok('lib/Regexp/Common/ANSIescape.pm');
+use PerlIO::via::EscStatus Renaming => [ print_status => 'pstat',
+                                         make_status => 'sm' ];
 
+ok (main->can('pstat'), 'pstat() imported');
+ok (main->can('sm'), 'sm() imported');
+my $str = 'some string';
+my $status = sm('some string');
+isnt ($status, $str, 'sm() changes string');
+like ($status, qr/\Q$str/, 'sm() contains original');
 exit 0;

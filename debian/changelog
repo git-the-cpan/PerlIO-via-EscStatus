@@ -1,5 +1,5 @@
-libperlio-via-escstatus-perl (7-1) unstable; urgency=low
+libperlio-via-escstatus-perl (8-1) unstable; urgency=low
 
   * Packaged version.
 
- -- Kevin Ryde <user42@zip.com.au>  Sat, 23 Jan 2010 16:10:56 +1100
+ -- Kevin Ryde <user42@zip.com.au>  Thu, 30 Sep 2010 09:15:59 +1000

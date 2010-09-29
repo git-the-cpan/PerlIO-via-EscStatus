@@ -32,7 +32,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use PerlIO::via::EscStatus::Parser;
 use Regexp::Common 'ANSIescape', 'no_defaults';
 
-our $VERSION = 7;
+our $VERSION = 8;
 
 # set this to 1 or 2 for some diagnostics to STDERR
 use constant DEBUG => 0;

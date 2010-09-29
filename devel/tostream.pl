@@ -1,4 +1,6 @@
-# Copyright 2008 Kevin Ryde
+#!/usr/bin/perl -w
+
+# Copyright 2008, 2010 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #

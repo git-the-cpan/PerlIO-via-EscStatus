@@ -17,34 +17,23 @@
 # You should have received a copy of the GNU General Public License along
 # with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
+
 use strict;
 use warnings;
-use PerlIO::via::EscStatus;
+use Test::More;
 
-binmode (STDOUT, ':via(EscStatus)')
-  or die $!;
+eval 'use Test::Synopsis; 1'
+  or plan skip_all => "due to Test::Synopsis not available -- $@";
 
+my $manifest = ExtUtils::Manifest::maniread();
+my @files = grep m{^lib/.*\.pm$}, keys %$manifest;
 
-my $foo = Foo->new;
-$foo->{'circular'} = $foo;
-print fileno(STDOUT),"\n";
-
-# after scope destructions, before global destruction
-use File::Coda;
-
-END {
-  print STDERR "my end\n";
-  print STDERR "  stdout ",fileno(STDOUT),"\n";
+if (! eval { require ProgressMonitor }) {
+  diag "skip ProgressMonitor::Stringify::ToEscStatus since ProgressMonitor.pm not available -- $@";
+  @files = grep {! m{/ProgressMonitor/Stringify/ToEscStatus.pm} } @files;
 }
 
+plan tests => 1 * scalar @files;
+
+Test::Synopsis::synopsis_ok(@files);
 exit 0;
-
-package Foo;
-sub new {
-  my $class = shift;
-  return bless {@_}, $class;
-}
-sub DESTROY {
-  print STDERR "destroy Foo\n";
-}
-
