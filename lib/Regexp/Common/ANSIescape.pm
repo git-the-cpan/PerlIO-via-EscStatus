@@ -24,7 +24,7 @@ use Carp;
 use Regexp::Common ();
 use vars ('$VERSION');
 
-$VERSION = 8;
+$VERSION = 9;
 
 ## no critic (ProhibitEscapedCharacters)
 

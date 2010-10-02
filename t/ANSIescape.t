@@ -27,7 +27,7 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
 
-my $want_version = 8;
+my $want_version = 9;
 is ($Regexp::Common::ANSIescape::VERSION, $want_version,
     'VERSION variable');
 is (Regexp::Common::ANSIescape->VERSION,  $want_version,

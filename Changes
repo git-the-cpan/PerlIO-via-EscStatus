@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License along
 with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 9, October 2010
+    - avoid status clearing prints after close, segfaults in perl 5.8.9
+
 Version 8, September 2010
     - test manifest only as an author test
 

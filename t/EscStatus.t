@@ -27,7 +27,7 @@ use lib 't';
 use MyTestHelpers;
 MyTestHelpers::nowarnings();
 
-my $want_version = 8;
+my $want_version = 9;
 is ($PerlIO::via::EscStatus::VERSION, $want_version,
     'VERSION variable');
 is (PerlIO::via::EscStatus->VERSION,  $want_version,

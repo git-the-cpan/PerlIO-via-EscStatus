@@ -32,7 +32,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use PerlIO::via::EscStatus::Parser;
 use Regexp::Common 'ANSIescape', 'no_defaults';
 
-our $VERSION = 8;
+our $VERSION = 9;
 
 # set this to 1 or 2 for some diagnostics to STDERR
 use constant DEBUG => 0;
@@ -123,10 +123,10 @@ sub UTF8 {
 #     but that doesn't apply as our push always succeeds
 #
 # As of Perl 5.10.0 CLOSE is called after PerlIO::via has closed the
-# sublayers (with PerlIOBase_close()) sublayers in $fh, so unfortunately
-# it's too late to print an _erase_status().  There's a FLUSH call from
-# PerlIOBase_close() just before the close, but there's no obvious way to
-# tell it's the last-ever flush.
+# sublayers (with PerlIOBase_close()) in $fh, so unfortunately it's too late
+# to print an _erase_status().  There's a FLUSH call from PerlIOBase_close()
+# just before the close, but there's no obvious way to tell it's the
+# last-ever flush.
 #
 # For POPPED must call flush on the sublayers to get the _erase_status() to
 # show immediately; nothing other happens on the sublayers just because
@@ -134,13 +134,19 @@ sub UTF8 {
 #
 sub CLOSE {
   my ($self, $fh) = @_;
-  if (DEBUG) { print STDERR "CLOSE $self $fh\n"; }
-  # return _erase_status ($self, $fh, 0); # no good, $fh already closed
+  if (DEBUG) { print STDERR "CLOSE() $self $fh\n"; }
+
+  # no good, $fh already closed
+  # return _erase_status ($self, $fh, 0);
+
+  # treat as now no status showing
+  $self->{'status'} = '';
+  $self->{'status_width'} = 0;
   return 0; # success
 }
 sub POPPED {
   my ($self, $fh) = @_;
-  if (DEBUG) { print STDERR "POP $self ", defined $fh ? $fh : 'undef', "\n"; }
+  if (DEBUG) { print STDERR "POPPED() $self ", (defined $fh ? $fh : 'undef'), "\n"; }
   _erase_status ($self, $fh, 1);
   return 0; # always claim success, per perliol(1) docs
 }
@@ -467,22 +473,22 @@ display in a command line program.
                                      ^--cursor left here
 
 Status lines are communicated to EscStatus "in band" in the output stream
-with an escape sequence.  Currently this is an ANSI "APC" application
-control, followed by the status line.  C<make_status> and C<print_status>
+using an escape sequence.  Currently this is an ANSI "APC" application
+control followed by the status line.  C<make_status> and C<print_status>
 below produce this.
 
     "\e_EscStatus\e\\Status string\n"
 
 The layer clears and redraws the status when ordinary output text is
 printed, so it appears as normal.  The status is also erased when the layer
-is popped (but unfortunately not when the stream is closed, see L</BUGS>
-below).
+is popped, though unfortunately not when the stream is closed, see L</BUGS>
+below.
 
 =head2 Motivation
 
 The idea of an output layer is that it lets you send ordinary output with
 plain C<print>, C<printf>, etc, and the layer takes care of what status is
-showing, to clear and redraw as necessary.
+showing and will clear and redraw as necessary.
 
 The alternative is a special message printing function to do the clearing.
 If you're in full control of your ordinary output then that's fine (for
@@ -513,9 +519,9 @@ each new line, so the next new status uses the new size.
 EscStatus follows the "utf8" flag of the layer below it when first pushed,
 allowing extended characters to be printed.  Often the layer below will be
 an C<":encoding"> for the user's terminal.  The difference for EscStatus is
-in the string width calculations on utf8 multibyte sequences.  Note that
-changes to the utf8 layer flag after pushing don't work properly (see
-L</BUGS> below).
+in the string width calculations for utf8 multibyte sequences.  Note that
+changing the utf8 flag after pushing doesn't work properly (see L</BUGS>
+below).
 
 For string width calculations tabs (C<\t>) are 8 spaces.  Various East Asian
 "double-width" characters take two columns.  BEL (C<\a>), ANSI escapes, and
@@ -525,11 +531,11 @@ off then the off escape is preserved.
 
 If a lower layer expands a character because it's unencodable on the final
 output then that's likely to make a mess of the width calculation.  For
-example the C<:encoding> layer C<PERLQQ> mode turns unencodables into 8
-characters C<"\x{1234}">, which is more than EscStatus will have allowed
-for.  The suggestion is to expand or transform before EscStatus so it sees
-what's really going to go out.  (An encode and re-decode is one way to do
-that, though a bit wasteful.)
+example the C<:encoding> layer C<PERLQQ> mode turns unencodables into an 8
+character sequence C<"\x{1234}">, which is more than EscStatus will have
+allowed for.  The suggestion is to expand or transform before EscStatus so
+it sees what's really going to go out.  An encode and re-decode is one way
+to do that, though a bit wasteful.
 
 =head1 FUNCTIONS
 
@@ -555,8 +561,8 @@ C<STDERR> alone.  Leaving C<STDERR> alone has the advantage of not putting
 anything in the way of an unexpected error print.  You can trap "normal"
 errors and turn them into a print on C<STDOUT>, leaving C<STDERR> only for
 the unexpected.  The alternative is to C<< >&= >> alias stderr onto stdout.
-The latter makes sense since there's only one actual destination (the
-terminal), once you trust EscStatus not to lose anything!
+That makes sense since there's only one actual destination (the terminal),
+once you trust EscStatus not to lose anything!
 
 When updating the displayed status it's important not to hammer the terminal
 with too much output.  It can easily become the speed of the terminal and
@@ -579,15 +585,14 @@ empty status to clear, or to pop the EscStatus (erasing works when popped).
 
 If the utf8 flag on the stream is changed (by C<binmode>) EscStatus doesn't
 notice and will keep using the state when it was first pushed.  Perhaps this
-will change in the future (assuming there's sensible uses for turning it on
-and off dynamically).
+will change in the future, assuming there's sensible uses for turning it on
+and off dynamically.
 
-As of Perl 5.10.0 an xsub using C<PerlIO_findFILE> like C<Term::Size>
-version 0.2 turns off the C<utf8> flag on the stream, preventing wide-char
-output.  EscStatus has a workaround for its use of C<Term::Size> but an
-application might need to do the same.  The symptom is the usual "Wide
-character in print" warning (on a stream you thought you'd already set for
-wide output).
+C<Term::Size> version 0.2 uses C<PerlIO_findFILE> and as of Perl 5.10.0 that
+turns off the C<utf8> flag on the stream, preventing wide-char output.
+EscStatus has a workaround for its use of C<Term::Size> but an application
+might need to do the same.  The symptom is the usual "Wide character in
+print" warning, on a stream you thought you'd already set for wide output.
 
 =head1 SEE ALSO
 

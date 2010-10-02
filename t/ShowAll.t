@@ -28,7 +28,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use PerlIO::via::EscStatus::ShowAll;
 
-my $want_version = 8;
+my $want_version = 9;
 is ($PerlIO::via::EscStatus::ShowAll::VERSION, $want_version,
     'VERSION variable');
 is (PerlIO::via::EscStatus::ShowAll->VERSION,  $want_version,
