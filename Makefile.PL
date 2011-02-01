@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -45,33 +45,32 @@ MyMakeMakerExtras::WriteMakefile
    SIGN         => 1,
    MIN_PERL_VERSION => '5.008005',
 
-   META_MERGE
-   => { resources
-        => { homepage => 'http://user42.tuxfamily.org/perlio-via-escstatus/index.html' },
-        optional_features
-        => { 
-             maximum_interoperation
-             => { description => 'Have maximum inter-operation with other modules (optional supported other stuff).',
-                  requires => { 'ProgressMonitor' => 0 },
-                },
+   META_MERGE =>
+   { resources =>
+     { homepage => 'http://user42.tuxfamily.org/perlio-via-escstatus/index.html' },
+     optional_features =>
+     { maximum_interoperation =>
+       { description => 'Have maximum inter-operation with other modules (optional supported other stuff).',
+         requires => { 'ProgressMonitor' => 0 },
+       },
 
-             maximum_examples
-             => { description => 'Be able to run all the example programs.',
-                  requires => { 'ProgressMonitor' => 0,
-                                'Term::Sk' => 0,
-                                # 'Time::HiRes' => 0,     # with 5.8 already
-                                # 'Term::ANSIColor' => 0, # with 5.6 already
-                                # 'charnames' => 0,       # with 5.6 already
-                              }
-                },
-             maximum_devel
-             => { description => 'Stuff used variously for development.',
-                  requires => { 'Devel::TraceLoad' => 0,
-                                'charnames' => 0,
-                                'Devel::FindRef' => 0,
-                                'Term::Sk' => 0,
-                              },
-                },
-           },
-      },
+       maximum_examples =>
+       { description => 'Be able to run all the example programs.',
+         requires => { 'ProgressMonitor' => 0,
+                       'Term::Sk' => 0,
+                       # 'Time::HiRes' => 0,     # with 5.8 already
+                       # 'Term::ANSIColor' => 0, # with 5.6 already
+                       # 'charnames' => 0,       # with 5.6 already
+                     }
+       },
+       maximum_devel =>
+       { description => 'Stuff used variously for development.',
+         requires => { 'Devel::TraceLoad' => 0,
+                       'charnames' => 0,
+                       'Devel::FindRef' => 0,
+                       'Term::Sk' => 0,
+                     },
+       },
+     },
+   },
   );

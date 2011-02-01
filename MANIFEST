@@ -45,6 +45,7 @@ MANIFEST.SKIP
 README
 SIGNATURE
 t/ANSIescape.t
+t/EscStatus-load.t
 t/EscStatus-Renaming.t
 t/EscStatus.t
 t/MyTestHelpers.pm

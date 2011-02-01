@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -27,7 +27,7 @@ package Foo;
 use strict;
 use warnings;
 
-sub _IsZero {
+sub IsZero {
   return "+utf8::Me\n"  # mark, enclosing
        . "+utf8::Mn\n"  # mark, non-spacing
        . "+utf8::Cf\n"  # control, format
@@ -40,7 +40,7 @@ package main;
 use strict;
 use warnings;
 
-sub _IsZZ {
+sub IsZZ {
   return "\n";
   return "+utf8::Me\n"  # mark, enclosing
        . "+utf8::Mn\n"  # mark, non-spacing
@@ -52,14 +52,14 @@ sub _IsZZ {
 
 my $str = "\a";
 
-if ($str =~ /\p{_IsZZ}/) {
+if ($str =~ /\p{IsZZ}/) {
   print "yes\n";
 } else {
   print "no\n";
 }
 
 package Foo;
-if ($str =~ /\p{_IsZero}/) {
+if ($str =~ /\p{IsZero}/) {
   print "yes\n";
 } else {
   print "no\n";

@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -24,7 +24,7 @@ use Carp;
 use Regexp::Common ();
 use vars ('$VERSION');
 
-$VERSION = 9;
+$VERSION = 10;
 
 ## no critic (ProhibitEscapedCharacters)
 
@@ -277,7 +277,7 @@ http://user42.tuxfamily.org/perlio-via-escstatus/index.html
 
 =head1 LICENSE
 
-Copyright 2008, 2009, 2010 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

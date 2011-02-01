@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -22,7 +22,7 @@ use warnings;
 use PerlIO::via::EscStatus;
 use PerlIO::via::EscStatus::Parser;
 
-our $VERSION = 9;
+our $VERSION = 10;
 
 use constant DEBUG => 0;
 
@@ -94,7 +94,7 @@ L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 
-Copyright 2008, 2009, 2010 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

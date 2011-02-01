@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -27,7 +27,7 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
 
-my $want_version = 9;
+my $want_version = 10;
 is ($Regexp::Common::ANSIescape::VERSION, $want_version,
     'VERSION variable');
 is (Regexp::Common::ANSIescape->VERSION,  $want_version,

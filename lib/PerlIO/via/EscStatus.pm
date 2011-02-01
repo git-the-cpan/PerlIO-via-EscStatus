@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -32,7 +32,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use PerlIO::via::EscStatus::Parser;
 use Regexp::Common 'ANSIescape', 'no_defaults';
 
-our $VERSION = 9;
+our $VERSION = 10;
 
 # set this to 1 or 2 for some diagnostics to STDERR
 use constant DEBUG => 0;
@@ -282,7 +282,7 @@ sub WRITE {
 # Zero-width char class.
 # CR treated as zero width in case it occurs as CRLF.
 #
-use constant _IsZero =>
+use constant IsZero =>
     "+utf8::Me\n"  # mark, enclosing
   . "+utf8::Mn\n"  # mark, non-spacing
   . "+utf8::Cf\n"  # control, format
@@ -295,16 +295,16 @@ use constant _IsZero =>
 # non-unicode charset there can be slightly different width rules, or
 # something like that.
 #
-use constant _IsDouble =>
+use constant IsDouble =>
     "+utf8::EastAsianWidth:W\n"
   . "+utf8::EastAsianWidth:F\n";
 
 # "Other" char class, being anything which doesn't introduce one of the
 # other regexp subexprs, and meaning in practice a single-width char.
 #
-use constant _IsOther =>
-    "!PerlIO::via::EscStatus::_IsZero\n"
-  . "-PerlIO::via::EscStatus::_IsDouble\n"
+use constant IsOther =>
+    "!PerlIO::via::EscStatus::IsZero\n"
+  . "-PerlIO::via::EscStatus::IsDouble\n"
   . "-0009\n"         # not a Tab
   . "-001B\n"         # not an Esc
   . "-0080\t009F\n";  # not an ANSI 8-bit escape, including not CSI
@@ -338,11 +338,11 @@ sub _truncate {
   my $col = 0;
   my $overflow = 0;
 
-  while ($str =~ /\G((\p{_IsZero}+)   # $2
-                  |(\p{_IsDouble}+)   # $3
+  while ($str =~ /\G((\p{IsZero}+)   # $2
+                  |(\p{IsDouble}+)   # $3
                   |(\t)               # $4
                   |($RE{ANSIescape})  # $5
-                  |\p{_IsOther}+
+                  |\p{IsOther}+
                   |.                  # plain Esc, either non-ANSI or malformed
                   )/gxo) {  # o -- compile $RE once
     my $part = $1;
@@ -606,7 +606,7 @@ L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 
-Copyright 2008, 2009, 2010 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

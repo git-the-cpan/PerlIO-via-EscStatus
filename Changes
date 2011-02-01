@@ -1,4 +1,4 @@
-Copyright 2008, 2009, 2010 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 This file is part of PerlIO-via-EscStatus.
 
@@ -15,6 +15,10 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 10, February 2011
+    - workaround for perl 5.14 incompatible change which breaks
+      private \p{_IsFoo} properties
 
 Version 9, October 2010
     - avoid status clearing prints after close, segfaults in perl 5.8.9

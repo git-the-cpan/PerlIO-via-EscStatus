@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -27,7 +27,7 @@ use lib 't';
 use MyTestHelpers;
 MyTestHelpers::nowarnings();
 
-my $want_version = 9;
+my $want_version = 10;
 is ($PerlIO::via::EscStatus::VERSION, $want_version,
     'VERSION variable');
 is (PerlIO::via::EscStatus->VERSION,  $want_version,
@@ -50,7 +50,7 @@ sub printable {
 }
 
 #------------------------------------------------------------------------------
-# _IsZero
+# IsZero
 
 ## no critic (ProhibitEscapedCharacters)
 my $_81_str = "\x{81}";
@@ -58,61 +58,61 @@ my $_9B_str = "\x{9B}";
 my $_9F_str = "\x{9F}";
 my $AD_str  = "\x{AD}";
 
-diag '_IsZero';
-ok ("\a"       =~ /\p{PerlIO::via::EscStatus::_IsZero}/);
-ok ("\r"       =~ /\p{PerlIO::via::EscStatus::_IsZero}/);
-ok ("\t"       !~ /\p{PerlIO::via::EscStatus::_IsZero}/);
-ok ("\e"       !~ /\p{PerlIO::via::EscStatus::_IsZero}/);
-ok ("X"        !~ /\p{PerlIO::via::EscStatus::_IsZero}/);
-ok ($_81_str   !~ /\p{PerlIO::via::EscStatus::_IsZero}/);
-ok ($_9B_str   !~ /\p{PerlIO::via::EscStatus::_IsZero}/);
-ok ($_9F_str   !~ /\p{PerlIO::via::EscStatus::_IsZero}/);
-ok ($AD_str    !~ /\p{PerlIO::via::EscStatus::_IsZero}/);
-ok ("\x{0300}" =~ /\p{PerlIO::via::EscStatus::_IsZero}/); # Mn
-ok ("\x{0488}" =~ /\p{PerlIO::via::EscStatus::_IsZero}/); # Me
-ok ("\x{1100}" !~ /\p{PerlIO::via::EscStatus::_IsZero}/); # W
-ok ("\x{FF10}" !~ /\p{PerlIO::via::EscStatus::_IsZero}/); # F
-ok ("\x{FEFF}" =~ /\p{PerlIO::via::EscStatus::_IsZero}/); # BOM
+diag 'IsZero';
+ok ("\a"       =~ /\p{PerlIO::via::EscStatus::IsZero}/);
+ok ("\r"       =~ /\p{PerlIO::via::EscStatus::IsZero}/);
+ok ("\t"       !~ /\p{PerlIO::via::EscStatus::IsZero}/);
+ok ("\e"       !~ /\p{PerlIO::via::EscStatus::IsZero}/);
+ok ("X"        !~ /\p{PerlIO::via::EscStatus::IsZero}/);
+ok ($_81_str   !~ /\p{PerlIO::via::EscStatus::IsZero}/);
+ok ($_9B_str   !~ /\p{PerlIO::via::EscStatus::IsZero}/);
+ok ($_9F_str   !~ /\p{PerlIO::via::EscStatus::IsZero}/);
+ok ($AD_str    !~ /\p{PerlIO::via::EscStatus::IsZero}/);
+ok ("\x{0300}" =~ /\p{PerlIO::via::EscStatus::IsZero}/); # Mn
+ok ("\x{0488}" =~ /\p{PerlIO::via::EscStatus::IsZero}/); # Me
+ok ("\x{1100}" !~ /\p{PerlIO::via::EscStatus::IsZero}/); # W
+ok ("\x{FF10}" !~ /\p{PerlIO::via::EscStatus::IsZero}/); # F
+ok ("\x{FEFF}" =~ /\p{PerlIO::via::EscStatus::IsZero}/); # BOM
 
 
 #------------------------------------------------------------------------------
-# _IsDouble
+# IsDouble
 
-diag '_IsDouble';
-ok ("\a"       !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
-ok ("\r"       !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
-ok ("\t"       !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
-ok ("\e"       !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
-ok ("X"        !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
-ok ($AD_str    !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
-ok ($_81_str   !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
-ok ($_9B_str   !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
-ok ($_9F_str   !~ /\p{PerlIO::via::EscStatus::_IsDouble}/);
-ok ("\x{0300}" !~ /\p{PerlIO::via::EscStatus::_IsDouble}/); # Mn
-ok ("\x{0488}" !~ /\p{PerlIO::via::EscStatus::_IsDouble}/); # Me
-ok ("\x{1100}" =~ /\p{PerlIO::via::EscStatus::_IsDouble}/); # W
-ok ("\x{FF10}" =~ /\p{PerlIO::via::EscStatus::_IsDouble}/); # F
-ok ("\x{FEFF}" !~ /\p{PerlIO::via::EscStatus::_IsDouble}/); # BOM
+diag 'IsDouble';
+ok ("\a"       !~ /\p{PerlIO::via::EscStatus::IsDouble}/);
+ok ("\r"       !~ /\p{PerlIO::via::EscStatus::IsDouble}/);
+ok ("\t"       !~ /\p{PerlIO::via::EscStatus::IsDouble}/);
+ok ("\e"       !~ /\p{PerlIO::via::EscStatus::IsDouble}/);
+ok ("X"        !~ /\p{PerlIO::via::EscStatus::IsDouble}/);
+ok ($AD_str    !~ /\p{PerlIO::via::EscStatus::IsDouble}/);
+ok ($_81_str   !~ /\p{PerlIO::via::EscStatus::IsDouble}/);
+ok ($_9B_str   !~ /\p{PerlIO::via::EscStatus::IsDouble}/);
+ok ($_9F_str   !~ /\p{PerlIO::via::EscStatus::IsDouble}/);
+ok ("\x{0300}" !~ /\p{PerlIO::via::EscStatus::IsDouble}/); # Mn
+ok ("\x{0488}" !~ /\p{PerlIO::via::EscStatus::IsDouble}/); # Me
+ok ("\x{1100}" =~ /\p{PerlIO::via::EscStatus::IsDouble}/); # W
+ok ("\x{FF10}" =~ /\p{PerlIO::via::EscStatus::IsDouble}/); # F
+ok ("\x{FEFF}" !~ /\p{PerlIO::via::EscStatus::IsDouble}/); # BOM
 
 
 #------------------------------------------------------------------------------
-# _IsOther
+# IsOther
 
-diag '_IsOther';
-ok ("\a"       !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
-ok ("\r"       !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
-ok ("\t"       !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
-ok ("\e"       !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
-ok ("X"        =~ /\p{PerlIO::via::EscStatus::_IsOther}/);
-ok ($AD_str    =~ /\p{PerlIO::via::EscStatus::_IsOther}/);
-ok ($_81_str   !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
-ok ($_9B_str   !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
-ok ($_9F_str   !~ /\p{PerlIO::via::EscStatus::_IsOther}/);
-ok ("\x{0300}" !~ /\p{PerlIO::via::EscStatus::_IsOther}/); # Mn
-ok ("\x{0488}" !~ /\p{PerlIO::via::EscStatus::_IsOther}/); # Me
-ok ("\x{1100}" !~ /\p{PerlIO::via::EscStatus::_IsOther}/); # W
-ok ("\x{FF10}" !~ /\p{PerlIO::via::EscStatus::_IsOther}/); # F
-ok ("\x{FEFF}" !~ /\p{PerlIO::via::EscStatus::_IsOther}/); # BOM
+diag 'IsOther';
+ok ("\a"       !~ /\p{PerlIO::via::EscStatus::IsOther}/);
+ok ("\r"       !~ /\p{PerlIO::via::EscStatus::IsOther}/);
+ok ("\t"       !~ /\p{PerlIO::via::EscStatus::IsOther}/);
+ok ("\e"       !~ /\p{PerlIO::via::EscStatus::IsOther}/);
+ok ("X"        =~ /\p{PerlIO::via::EscStatus::IsOther}/);
+ok ($AD_str    =~ /\p{PerlIO::via::EscStatus::IsOther}/);
+ok ($_81_str   !~ /\p{PerlIO::via::EscStatus::IsOther}/);
+ok ($_9B_str   !~ /\p{PerlIO::via::EscStatus::IsOther}/);
+ok ($_9F_str   !~ /\p{PerlIO::via::EscStatus::IsOther}/);
+ok ("\x{0300}" !~ /\p{PerlIO::via::EscStatus::IsOther}/); # Mn
+ok ("\x{0488}" !~ /\p{PerlIO::via::EscStatus::IsOther}/); # Me
+ok ("\x{1100}" !~ /\p{PerlIO::via::EscStatus::IsOther}/); # W
+ok ("\x{FF10}" !~ /\p{PerlIO::via::EscStatus::IsOther}/); # F
+ok ("\x{FEFF}" !~ /\p{PerlIO::via::EscStatus::IsOther}/); # BOM
 
 
 #------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -33,7 +33,7 @@ plan tests => 8;
 
 require ProgressMonitor::Stringify::ToEscStatus;
 
-my $want_version = 9;
+my $want_version = 10;
 is ($ProgressMonitor::Stringify::ToEscStatus::VERSION, $want_version,
     'VERSION variable');
 is (ProgressMonitor::Stringify::ToEscStatus->VERSION,  $want_version,
