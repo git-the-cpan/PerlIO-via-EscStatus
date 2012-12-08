@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               PerlIO-via-EscStatus
-version:            10
+version:            11
 abstract:           Printing a status line through an I/O layer.
 author:
     - Kevin Ryde <user42@zip.com.au>
@@ -11,11 +11,12 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    Encode:          0
-    perl:            5.008005
-    PerlIO::via:     0
-    Regexp::Common:  0
-    Term::Size:      0
+    Encode:               0
+    perl:                 5.008005
+    PerlIO::via:          0
+    Regexp::Common:       0
+    Regexp::Common::ANSIescape:  11
+    Term::Size:           0
 resources:
     homepage:  http://user42.tuxfamily.org/perlio-via-escstatus/index.html
     license:   http://www.gnu.org/licenses/gpl.html
@@ -24,21 +25,11 @@ no_index:
         - t
         - inc
         - devel
-        - examples
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+generated_by:       ExtUtils::MakeMaker version 6.57_05
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4
 optional_features:
-    maximum_devel:
-        description:  Stuff used variously for development.
-        requires:
-            charnames:          0
-            Devel::FindRef:     0
-            Devel::TraceLoad:   0
-            Pod::Simple::HTML:  0
-            Term::Sk:           0
-            warnings::unused:   0
     maximum_examples:
         description:  Be able to run all the example programs.
         requires:
@@ -48,14 +39,3 @@ optional_features:
         description:  Have maximum inter-operation with other modules (optional supported other stuff).
         requires:
             ProgressMonitor:  0
-    maximum_tests:
-        description:  Have "make test" do as much as possible.
-        requires:
-            Parse::CPAN::Meta:   0
-            Test::DistManifest:  0
-            Test::Pod:           1.00
-            Test::YAML::Meta:    0.15
-            YAML:                0
-            YAML::Syck:          0
-            YAML::Tiny:          0
-            YAML::XS:            0

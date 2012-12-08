@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -26,7 +26,7 @@ eval 'use Test::Synopsis; 1'
   or plan skip_all => "due to Test::Synopsis not available -- $@";
 
 my $manifest = ExtUtils::Manifest::maniread();
-my @files = grep m{^lib/.*\.pm$}, keys %$manifest;
+my @files = grep {m{^lib/.*\.pm$}} keys %$manifest;
 
 if (! eval { require ProgressMonitor }) {
   diag "skip ProgressMonitor::Stringify::ToEscStatus since ProgressMonitor.pm not available -- $@";

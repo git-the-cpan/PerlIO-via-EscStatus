@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -32,7 +32,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use PerlIO::via::EscStatus::Parser;
 use Regexp::Common 'ANSIescape', 'no_defaults';
 
-our $VERSION = 10;
+our $VERSION = 11;
 
 # set this to 1 or 2 for some diagnostics to STDERR
 use constant DEBUG => 0;
@@ -474,21 +474,24 @@ display in a command line program.
 
 Status lines are communicated to EscStatus "in band" in the output stream
 using an escape sequence.  Currently this is an ANSI "APC" application
-control followed by the status line.  C<make_status> and C<print_status>
+control followed by the status line.  C<make_status()> and C<print_status()>
 below produce this.
 
     "\e_EscStatus\e\\Status string\n"
 
-The layer clears and redraws the status when ordinary output text is
-printed, so it appears as normal.  The status is also erased when the layer
-is popped, though unfortunately not when the stream is closed, see L</BUGS>
-below.
+The layer clears and redraws the status when ordinary output text is printed
+so it appears as normal.  The status is also erased when the layer is
+popped, though unfortunately not when the stream is closed (see L</BUGS>
+below).
+
+See F<examples/demo.pl> in the PerlIO-via-EscStatus sources for a simple
+complete program.
 
 =head2 Motivation
 
 The idea of an output layer is that it lets you send ordinary output with
 plain C<print>, C<printf>, etc, and the layer takes care of what status is
-showing and will clear and redraw as necessary.
+showing and should be cleared and redrawn.
 
 The alternative is a special message printing function to do the clearing.
 If you're in full control of your ordinary output then that's fine (for
@@ -505,29 +508,34 @@ escapes form until being re-sent to a final EscStatus layer on C<STDOUT>.
 The escape format chosen is meant to be easy to produce and tolerably
 readable if for some reason crunching by EscStatus is missed.  The
 C<EscStatus::ShowAll> layer lets you explicitly print all status lines for
-development, or the C<EscStatus::ShowNone> layer lets you strip them for a
-quiet mode or batch mode operation.  (See L<PerlIO::via::EscStatus::ShowAll>
-and L<PerlIO::via::EscStatus::ShowNone>.)
+development.  Or the C<EscStatus::ShowNone> layer strips them for a quiet
+mode or batch mode operation.  (See L<PerlIO::via::EscStatus::ShowAll> and
+L<PerlIO::via::EscStatus::ShowNone>.)
 
 =head1 CHARACTERS
 
 Each status line is truncated to the width of the terminal as determined by
 C<Term::Size::chars()> (see L<Term::Size>).  No attempt is made (as yet) to
 monitor C<SIGWINCH> for changes to the width, though the size is checked for
-each new line, so the next new status uses the new size.
+each new line so the next new status uses the new size.
 
 EscStatus follows the "utf8" flag of the layer below it when first pushed,
 allowing extended characters to be printed.  Often the layer below will be
-an C<":encoding"> for the user's terminal.  The difference for EscStatus is
-in the string width calculations for utf8 multibyte sequences.  Note that
-changing the utf8 flag after pushing doesn't work properly (see L</BUGS>
-below).
+an C<":encoding"> for the user's terminal (eg. F<examples/fracs.pl> in the
+PerlIO-via-EscStatus sources).  The difference for EscStatus is in the
+string width calculations for utf8 multibyte sequences.  Note that changing
+the utf8 flag after pushing doesn't work properly (see L</BUGS> below).
 
 For string width calculations tabs (C<\t>) are 8 spaces.  Various East Asian
 "double-width" characters take two columns.  BEL (C<\a>), ANSI escapes, and
-various unicode modifier characters take no space.  If a status line is
-truncated then all ANSI escapes are kept, so if say bold is turned on and
-off then the off escape is preserved.
+various unicode modifier characters take no space.  See F<examples/wide.pl>
+in the PerlIO-via-EscStatus sources for a complete program printing
+double-width East Asian characters.
+
+If a status line is truncated then all ANSI escapes are kept, so if say bold
+is turned on and off then the off escape is preserved.  See
+F<examples/colour.pl> in the PerlIO-via-EscStatus sources for an example of
+SGR colour escapes.
 
 If a lower layer expands a character because it's unencodable on the final
 output then that's likely to make a mess of the width calculation.  For
@@ -564,10 +572,10 @@ the unexpected.  The alternative is to C<< >&= >> alias stderr onto stdout.
 That makes sense since there's only one actual destination (the terminal),
 once you trust EscStatus not to lose anything!
 
-When updating the displayed status it's important not to hammer the terminal
+When updating a displayed status it's important not to hammer the terminal
 with too much output.  It can easily become the speed of the terminal and
-not the speed of the program which is the limiting factor.  The trick
-generally is to print a new status only say once per second.  This means the
+not the speed of the program which is the limiting factor.  Generally the
+trick is to print a new status only say once per second.  This means the
 display isn't perfectly up-to-date, but the only time that's a problem is if
 the program goes away number crunching for a long time with an old status
 showing, in which case the wrong processing stage gets the blame for the
@@ -600,13 +608,16 @@ L<PerlIO::via>, L<PerlIO::via::EscStatus::ShowAll>,
 L<PerlIO::via::EscStatus::ShowNone>,
 L<ProgressMonitor::Stringify::ToEscStatus>
 
+L<Term::Sk> formatting progress status messages, and F<examples/term-sk.pl>
+in the PerlIO-via-EscStatus sources for combining that with EscStatus.
+
 =head1 HOME PAGE
 
 L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 
-Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

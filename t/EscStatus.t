@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -27,7 +27,7 @@ use lib 't';
 use MyTestHelpers;
 MyTestHelpers::nowarnings();
 
-my $want_version = 10;
+my $want_version = 11;
 is ($PerlIO::via::EscStatus::VERSION, $want_version,
     'VERSION variable');
 is (PerlIO::via::EscStatus->VERSION,  $want_version,

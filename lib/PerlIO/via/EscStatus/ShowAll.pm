@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -22,7 +22,7 @@ use warnings;
 use PerlIO::via::EscStatus;
 use PerlIO::via::EscStatus::Parser;
 
-our $VERSION = 10;
+our $VERSION = 11;
 
 use constant DEBUG => 0;
 
@@ -84,6 +84,9 @@ EscStatus "APC" intro control sequence and lets the rest go straight
 through.  If your terminal doesn't mind miscellaneous APC sequences then it
 might even be readable with no filtering at all.
 
+See F<examples/showall.pl> in the PerlIO-via-EscStatus sources for a
+complete program using ShowAll.
+
 =head1 SEE ALSO
 
 L<PerlIO::via::EscStatus>, L<PerlIO::via>
@@ -94,7 +97,7 @@ L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 
-Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the
